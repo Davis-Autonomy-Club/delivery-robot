@@ -11,6 +11,8 @@ python cad/source/generate_delivery_robot_cad.py
 
 The generated v2.2 preview renders were opened and inspected during the CAD pass:
 
+![Top-down base layout](renders/checkpoint_2_base_top.png)
+
 ![Complete robot reference](renders/checkpoint_2_complete_robot_iso.png)
 
 ![Low angle wheel/body clearance](renders/checkpoint_2_complete_robot_low_angle.png)
@@ -27,6 +29,7 @@ Inspection notes:
 
 - The four-wheel layout clears the body panels.
 - The chassis split pieces are under 220 x 220 mm.
+- The top-down base render shows the split base plates, electronics trays, and wheel spacing in their expected positions.
 - The front panels include two HC-SR04 openings and a front LED diffuser slot.
 - The food payload sits in the upper cargo bay on a printed shelf, inside retainer rails, above the electronics bay.
 - The maximum sealed food container envelope is 205 x 145 x 70 mm.

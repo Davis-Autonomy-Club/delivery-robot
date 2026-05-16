@@ -8,8 +8,18 @@ This file records what is actually in the active Amazon cart so the repo does no
 
 - Active Amazon cart: 36 line items, 38 units.
 - Amazon subtotal shown in cart: $617.05 before tax and shipping.
-- Known Pololu cart from the last sync: $379.35 before tax and shipping.
+- Pololu cart verified live on May 16, 2026: $379.35 before tax and shipping.
 - Combined pre-tax purchase subtotal if the Pololu cart is unchanged: $996.40.
+
+## Active Pololu Cart Items
+
+| Qty | Active Pololu item | Product | Each | Line |
+| ---: | --- | --- | ---: | ---: |
+| 4 | 30:1 Metal Gearmotor 37Dx68L mm 12V with 64 CPR Encoder | [#4752](https://www.pololu.com/product/4752) | $60.95 | $243.80 |
+| 4 | Machined Aluminum Bracket for 37D mm Metal Gearmotors | [#1995](https://www.pololu.com/product/1995) | $12.95 | $51.80 |
+| 2 | 12 mm Hex Wheel Adapter for 6 mm Shaft, 2-pack | [#2686](https://www.pololu.com/product/2686) | $6.95 | $13.90 |
+| 2 | 5 V, 5 A Step-Down Voltage Regulator D24V50F5 | [#2851](https://www.pololu.com/product/2851) | $29.95 | $59.90 |
+| 1 | ACS724LLCTR-30AU Current Sensor Carrier 0 A to 30 A | [#4046](https://www.pololu.com/product/4046) | $9.95 | $9.95 |
 
 ## Active Amazon Cart Items
 
@@ -69,6 +79,8 @@ These were visible outside the active cart or are required by the build but abse
 | LiPo-safe charging bag | Not active | Required for safe LiPo charging/storage unless the existing Zeee bag is being used. |
 | Multimeter, wire stripper, crimper/soldering iron, needle-nose pliers, hex keys, flush cutters | Not active | Required tools; okay to omit from cart only if the shop/lab already has them. |
 | 3D printer | Not active | Fine to omit if printing is outsourced or a printer is already available. |
+
+Known saved-for-later add-back subtotal for wheels, fuses, fuse holders, and WAGO connectors is at least $68.82 before tax/shipping. The real all-in build cost is therefore above the $996.40 active-cart subtotal unless those items are already owned or replaced by equivalents.
 
 ## Compatibility Notes From This Sync
 

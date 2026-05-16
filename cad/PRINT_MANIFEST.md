@@ -86,6 +86,7 @@ Maximum food-safe container outer size: 205 x 145 x 70 mm. Use a sealed food-saf
 | --- | --- |
 | `cad/print-ready/full-size/original_four_piece_base_merged_full_size.stl` | Existing repo STLs merged into one full-size reference |
 | `cad/print-ready/full-size/v2_robot_complete_reference_not_for_print.stl` | Assembly visualization only; not intended for slicing |
+| `cad/renders/checkpoint_2_base_top.png` | Rendered top-down base layout check |
 | `cad/renders/checkpoint_2_complete_robot_iso.png` | Rendered visual check |
 | `cad/renders/checkpoint_2_complete_robot_low_angle.png` | Rendered wheel/body clearance check |
 | `cad/renders/checkpoint_2_printed_panel_samples.png` | Rendered print-part sample check |

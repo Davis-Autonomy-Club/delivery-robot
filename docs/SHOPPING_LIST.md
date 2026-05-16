@@ -6,13 +6,14 @@ Buying links are collected in [`docs/SOURCED_SHOPPING_LINKS_CA.md`](SOURCED_SHOP
 
 ## Current Cart Status
 
-As of the May 16, 2026 cart sync, the active Amazon cart contains 36 line items / 38 units with a $617.05 pre-tax subtotal. The known Pololu cart from the previous sync was $379.35, so the combined pre-tax subtotal is $996.40 if that Pololu cart is unchanged.
+As of the May 16, 2026 cart sync, the active Amazon cart contains 36 line items / 38 units with a $617.05 pre-tax subtotal. The live Pololu cart was also verified at $379.35, so the combined active-cart subtotal is $996.40 before tax and shipping.
 
 That active Amazon cart is not a complete build kit by itself. It assumes some required parts and tools are already on hand or will be supplied separately:
 
 - Compatible 120 mm / 12 mm-hex wheels, fuses, inline fuse holder, power distribution block, printable filament, battery straps, LiPo-safe bag, and basic wiring/assembly tools are not active in the Amazon cart.
 - The two cameras, LTE modem, SIM, and USB cabling are active, but the Raspberry Pi and microSD card are not. Keep that only if a Pi and microSD are already available; otherwise add them back before building the camera/LTE stack.
 - The B6 charger and XT60 pigtail kit are still active. If the existing OVONIC X1 charger and MCIGICM XT60H connectors will replace them, delete those cart lines and update this section again.
+- The known saved-for-later add-back subtotal for wheels, fuses, fuse holders, and WAGO connectors is at least $68.82 before tax/shipping, so the active carts are below $1,000 only because several required items are outside the active cart.
 
 ## Buy These Parts
 

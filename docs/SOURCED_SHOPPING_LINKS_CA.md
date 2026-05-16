@@ -1,6 +1,6 @@
 # Sourced Shopping Links For California
 
-Updated for v2.2 on May 16, 2026. The latest active-cart snapshot is in [`CURRENT_AMAZON_CART_SYNC.md`](CURRENT_AMAZON_CART_SYNC.md). Exact Amazon delivery dates and seller quality change frequently, so re-check before purchase. Pololu links are preferred for drivetrain and sensor parts because the CAD and wiring depend on their dimensions/specs.
+Updated for v2.2 on May 16, 2026. The latest active-cart snapshot and line-item prices are in [`CURRENT_AMAZON_CART_SYNC.md`](CURRENT_AMAZON_CART_SYNC.md). Exact Amazon delivery dates and seller quality change frequently, so re-check before purchase. Pololu links are preferred for drivetrain and sensor parts because the CAD and wiring depend on their dimensions/specs.
 
 ## Critical Robot Parts
 

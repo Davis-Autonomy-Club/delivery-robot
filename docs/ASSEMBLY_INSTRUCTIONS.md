@@ -20,8 +20,9 @@ Print the files listed in `cad/PRINT_MANIFEST.md`. After printing:
 1. Confirm the four base plates are flat and not curled.
 2. Test an M3 screw through every base seam hole, panel hole, corner-post hole, tray hole, and camera-mount hole. Clear tight holes with a 3.0-3.2 mm drill bit by hand.
 3. Dry-fit the four base plates on a table. The total base should be about 322 x 328 mm.
-4. Confirm the v2.2 parts are present: camera mount, servo lock mount, lock cam, lock keeper, Raspberry Pi tray, LTE tray, telemetry plate, two buck-converter plates, external stop button, and lid-closed switch.
-5. Check the renders in `cad/renders/` against your printed parts so you know what the final shape should look like.
+4. Confirm the v2.2 printed parts are present: camera mounts, servo lock mount, lock cam, lock keeper, Raspberry Pi tray, LTE tray, telemetry plate, and two buck-converter plates.
+5. Confirm the non-printed v2.2 hardware is available before final assembly: external stop button, lid-closed switch, fuse holder, fuses, distribution block, compatible wheels, battery straps, and Raspberry Pi/microSD if you are building the camera/LTE stack.
+6. Check the renders in `cad/renders/` against your printed parts so you know what the final shape should look like.
 
 ## 2. Assemble The Base
 
