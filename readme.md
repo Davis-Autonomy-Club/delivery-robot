@@ -7,6 +7,19 @@ This Repo contains the Code, 3D Prints and Schematic to Build your own Simple Ar
 
 Feel free to contribute to the Repo. More info on: [smartbuilds.io](https://smartbuilds.io)
 
+## Complete v2 Build Package
+
+The original repo only included four cut chassis STL files. This repo now also includes a full compatible v2 build package:
+
+- Print-ready CAD: [`cad/print-ready`](cad/print-ready)
+- CAD source generator: [`cad/source/generate_delivery_robot_cad.py`](cad/source/generate_delivery_robot_cad.py)
+- Print manifest and settings: [`cad/PRINT_MANIFEST.md`](cad/PRINT_MANIFEST.md)
+- Full shopping list: [`docs/SHOPPING_LIST.md`](docs/SHOPPING_LIST.md)
+- Full assembly, wiring, upload, and test instructions: [`docs/ASSEMBLY_INSTRUCTIONS.md`](docs/ASSEMBLY_INSTRUCTIONS.md)
+- Visual render checks: [`cad/renders`](cad/renders)
+
+The v2 CAD is designed around the same Arduino Mega + four BTS7960 motor-driver wiring style, with 12 V 37D gearmotors, 6 mm D shafts, 12 mm hex wheel adapters, 120 mm wheels, a 3S LiPo battery, optional HC-SR04 front sensors, and an upper cargo bay for a sealed food-safe container up to 205 x 145 x 70 mm.
+
 
 # Part List:
 
