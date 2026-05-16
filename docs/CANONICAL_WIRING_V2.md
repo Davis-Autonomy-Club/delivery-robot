@@ -1,8 +1,10 @@
-# Canonical V2.2 Wiring
+# Canonical Minimum Wiring
 
-This file is the wiring source of truth for the v2.2 build. The old root-level Fritzing/block-diagram image is legacy and incomplete.
+This file is the wiring source of truth for the first-principles outdoor baseline. The old root-level Fritzing/block-diagram image and the previous v2.2 wiring are historical and include parts that are no longer in the default build.
 
-![Canonical v2.2 wiring diagram](wiring_v2_2_canonical.svg)
+![Minimum wiring diagram](wiring_v2_2_canonical.svg)
+
+Outdoor means fair-weather splash resistance on pavement or packed paths. It does not mean rain, puddles, sprinklers, mud, or submersion.
 
 ## Non-Negotiable Safety Rules
 
@@ -10,10 +12,12 @@ This file is the wiring source of truth for the v2.2 build. The old root-level F
 - Keep the inline fuse within 100 mm of battery positive.
 - Put the main switch or XT60 loop key after the fuse and before the rest of the robot.
 - Use a real positive distribution block and a real negative distribution block.
-- All grounds must be common: battery negative, Arduino ground, Pi buck ground, logic buck ground, BTS7960 grounds, servo ground, current-sensor ground, and voltage-divider ground.
+- All grounds must be common: battery negative, Arduino ground, 5 V buck ground, and BTS7960 grounds.
 - Never charge the LiPo through the robot wiring.
-- The external stop button and lid-closed switch are Arduino drive-lockout inputs. They do not replace the main switch or XT60 loop key as the hard power disconnect.
-- Install only one LiPo pack in the robot at a time. The second matching pack is a charged spare for repeated testing.
+- The external stop button is a firmware drive-lockout input. It does not replace the main switch or XT60 loop key as the hard power disconnect.
+- Install only one LiPo pack in the robot at a time.
+- Route outdoor cables with drip loops, grommets or cable glands, and strain relief before they enter the electronics bay.
+- Keep connectors and distribution blocks above the removable splash sheet and away from upward-facing water pockets.
 
 ## Power Path
 
@@ -21,32 +25,25 @@ This file is the wiring source of truth for the v2.2 build. The old root-level F
 3S LiPo XT60+
   -> 25 A blade fuse
   -> main switch or XT60 loop key
-  -> Pololu ACS724 0-30 A current sensor IP+
-  -> Pololu ACS724 current sensor IP-
   -> positive distribution block
   -> four BTS7960 B+ terminals
-  -> logic/accessory 5 V buck input+
-  -> Pi/camera/LTE 5 V buck input+
+  -> 5 V buck input+
 
 3S LiPo XT60-
   -> negative distribution block
   -> four BTS7960 B- terminals
-  -> logic/accessory 5 V buck input-
-  -> Pi/camera/LTE 5 V buck input-
+  -> 5 V buck input-
 ```
 
-## 5 V Rails
+## 5 V Rail
 
-Use two buck converters:
+Use one 5 V buck converter:
 
 | Rail | Loads | Notes |
 | --- | --- | --- |
-| Logic/accessory 5 V | Arduino Mega `5V`, BTS7960 `Vcc`, BTS7960 logic grounds, lid-lock servo, ACS724 sensor, voltage divider reference ground | Set to 5.0-5.1 V before connecting |
-| Pi/camera/LTE 5 V | Raspberry Pi USB-C input, USB cameras, USB LTE modem | Use a separate 5 V 5 A buck and a rated USB-C power pigtail/breakout |
+| Logic 5 V | Arduino Mega `5V`, BTS7960 `Vcc`, voltage-divider ground reference | Set to 5.0-5.1 V before connecting electronics |
 
-The two 5 V positive rails should stay separate. The grounds are common.
-
-Skip the desk-style wall-adapter USB hub for the first build. The Pi has four USB ports for the Arduino, front camera, rear camera, and LTE modem. If testing shows USB brownouts later, use a compact hub that is intentionally fed from the onboard 5 V Pi rail.
+Do not feed raw 3S battery voltage to the Arduino `5V` pin or any BTS7960 logic pin.
 
 ## Arduino Signal Map
 
@@ -59,34 +56,21 @@ Skip the desk-style wall-adapter USB hub for the first build. The Pi has four US
 | `R1` | Front-right | D5 | D4 | D47 | D48 | D46 | D49 |
 | `R2` | Rear-right | D9 | D8 | D51 | D52 | D50 | D53 |
 
-### Encoders
+For every driver:
 
-| Encoder | A channel | B channel | Power |
-| --- | ---: | ---: | --- |
-| `L1` front-left | D18 | D34 | 5 V and GND |
-| `L2` rear-left | D19 | D35 | 5 V and GND |
-| `R1` front-right | D20 | D36 | 5 V and GND |
-| `R2` rear-right | D21 | D37 | 5 V and GND |
+- BTS7960 `Vcc` goes to the regulated 5 V rail.
+- BTS7960 `Gnd` goes to common ground.
+- Use 22-26 AWG signal wire.
+- Keep signal wires away from motor power wires where practical.
 
-### Telemetry, Lock, And Safety Inputs
+### Safety And Battery Sense
 
 | Function | Arduino pin | Wiring |
 | --- | ---: | --- |
-| Lid-lock servo signal | D44 | Servo red to 5 V accessory rail, brown/black to common ground |
 | External stop input | D42 | Normally-closed stop switch contact from D42 to GND. Released/healthy = LOW; pressed or unplugged = HIGH |
-| Lid-closed input | D43 | Reed switch or microswitch from D43 to GND. Closed lid = LOW; open lid = HIGH |
 | Battery voltage divider output | A0 | 100 kOhm top resistor from switched battery positive to A0; 33 kOhm bottom resistor from A0 to ground |
-| ACS724 current sensor output | A1 | ACS724 `VIOUT` to A1, `VCC` to 5 V accessory rail, `GND` to common ground |
 
-## Pi, Cameras, And LTE
-
-- Raspberry Pi connects to the Arduino Mega by USB.
-- Front USB/UVC camera connects to the Pi.
-- Rear USB/UVC camera connects to the Pi.
-- USB LTE modem connects to the Pi and needs its own activated SIM/data plan.
-- Use a USB A-to-B cable for the Arduino Mega unless your Mega kit includes one.
-- Do not install the desk-style Sabrent wall-adapter USB hub. Use the Pi ports directly for the first build.
-- The current Arduino sketch does not implement a web dashboard. It exposes serial commands and telemetry so the Pi can run the teleop software in the next phase.
+The voltage divider is only for sensing. It must not power anything.
 
 ## Serial Commands
 
@@ -99,13 +83,10 @@ At 9600 baud:
 | `L` or `Left` | Short left pivot |
 | `R` or `Right` | Short right pivot |
 | `S` or `Stop` | Stop all motors |
-| `LOCK` | Rotate servo to locked lid position |
-| `UNLOCK` | Rotate servo to unlocked lid position |
-| `STATUS`, `TELEMETRY`, or `T` | Print battery/current/lock/encoder telemetry |
-| `ZEROENC` | Reset encoder counts to zero |
+| `STATUS`, `TELEMETRY`, or `T` | Print battery and stop-state telemetry |
 
 Telemetry prints as:
 
 ```text
-TEL,V=12.10,I=1.25,LOW=0,ESTOP=0,LID_CLOSED=1,LOCK=1,ENC=123/121/119/124
+TEL,V=12.10,LOW=0,ESTOP=0
 ```

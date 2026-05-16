@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-Generate the full-size printable CAD package for the Arduino delivery robot.
+Generate the full-size printable CAD package for the minimum outdoor Arduino
+delivery robot.
 
 The models are intentionally parametric and conservative: slots are used where
 commodity module hole patterns vary, while the critical envelopes match the
-Arduino Mega, BTS7960 modules, encoder 37D gearmotors, 120 mm wheels,
-Raspberry Pi companion computer, front/rear cameras, and lid-lock hardware
-listed in the build guide.
+Arduino Mega, BTS7960 modules, 37D gearmotors, 120 mm wheels, one 5 V buck
+converter, and a sealed food-container cargo bay.
+
+Outdoor splash protection is handled by a hand-cut flat plastic sheet instead
+of generated CAD. That keeps the weathering fix cheap, replaceable, and easy
+to trim after real wheel/splash tests.
 """
 
 from __future__ import annotations
@@ -27,6 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CAD_ROOT = ROOT / "cad"
 OUT = CAD_ROOT / "print-ready"
 RENDER_OUT = CAD_ROOT / "renders"
+VIEW_OUT = CAD_ROOT / "view-assembly"
 
 
 @dataclass(frozen=True)
@@ -55,17 +60,9 @@ class Dims:
     cargo_floor_t: float = 4.0
     cargo_floor_z: float = 66.0
     cargo_support_hole_z: float = 60.0
-    cargo_rail_h: float = 16.0
     max_food_box_len: float = 205.0
     max_food_box_w: float = 145.0
     max_food_box_h: float = 70.0
-    camera_mount_w: float = 64.0
-    camera_mount_h: float = 42.0
-    camera_mount_t: float = 3.0
-    pi_tray_len: float = 104.0
-    pi_tray_w: float = 76.0
-    lte_tray_len: float = 96.0
-    lte_tray_w: float = 42.0
 
 
 D = Dims()
@@ -78,10 +75,17 @@ def ensure_dirs() -> None:
         OUT / "body",
         OUT / "cargo",
         OUT / "electronics",
-        OUT / "accessories",
         RENDER_OUT,
+        VIEW_OUT,
     ]:
         p.mkdir(parents=True, exist_ok=True)
+
+
+def reset_generated_outputs() -> None:
+    for p in [OUT, RENDER_OUT]:
+        if p.exists():
+            shutil.rmtree(p)
+    ensure_dirs()
 
 
 def box(size: tuple[float, float, float], center: tuple[float, float, float]) -> trimesh.Trimesh:
@@ -251,55 +255,6 @@ def battery_sled() -> trimesh.Trimesh:
     return difference(mesh, cutters)
 
 
-def pi_companion_tray() -> trimesh.Trimesh:
-    """Tray for a Raspberry Pi 4/5-size companion computer footprint."""
-    bosses = [(-29, -24.5), (29, -24.5), (-29, 24.5), (29, 24.5)]
-    slots = [(-42, 0, 7, 56), (42, 0, 7, 56), (0, -33, 78, 6), (0, 33, 78, 6)]
-    tray = electronics_tray((D.pi_tray_len, D.pi_tray_w), bosses, slots)
-    fence = [
-        box((D.pi_tray_len, 4, 9), (0, D.pi_tray_w / 2 - 2, 6.5)),
-        box((D.pi_tray_len, 4, 9), (0, -D.pi_tray_w / 2 + 2, 6.5)),
-    ]
-    return union([tray, *fence])
-
-
-def lte_modem_tray() -> trimesh.Trimesh:
-    base = box((D.lte_tray_len, D.lte_tray_w, 4), (0, 0, 2))
-    rails = [
-        box((D.lte_tray_len, 4, 9), (0, D.lte_tray_w / 2 - 2, 6.5)),
-        box((D.lte_tray_len, 4, 9), (0, -D.lte_tray_w / 2 + 2, 6.5)),
-        box((4, D.lte_tray_w - 6, 9), (-D.lte_tray_len / 2 + 2, 0, 6.5)),
-    ]
-    cutters = [
-        slot_cut_z(-28, 0, 7, D.lte_tray_w - 10, 3, 12),
-        slot_cut_z(28, 0, 7, D.lte_tray_w - 10, 3, 12),
-        cyl_z(1.7, 10, (-40, 14, 3), 24),
-        cyl_z(1.7, 10, (-40, -14, 3), 24),
-        cyl_z(1.7, 10, (40, 14, 3), 24),
-        cyl_z(1.7, 10, (40, -14, 3), 24),
-    ]
-    return difference(union([base, *rails]), cutters)
-
-
-def telemetry_sensor_plate() -> trimesh.Trimesh:
-    plate = box((82, 50, 4), (0, 0, 2))
-    label_rail = [
-        box((82, 3, 5), (0, 23.5, 6.5)),
-        box((82, 3, 5), (0, -23.5, 6.5)),
-    ]
-    cutters = [
-        # Pololu ACS724 mounting holes and generic divider-board tie slots.
-        cyl_z(1.35, 10, (-24, -12, 3), 24),
-        cyl_z(1.35, 10, (-24, 12, 3), 24),
-        cyl_z(1.35, 10, (24, -12, 3), 24),
-        cyl_z(1.35, 10, (24, 12, 3), 24),
-        slot_cut_z(0, 0, 56, 6, 3, 12),
-        slot_cut_z(-35, 0, 6, 34, 3, 12),
-        slot_cut_z(35, 0, 6, 34, 3, 12),
-    ]
-    return difference(union([plate, *label_rail]), cutters)
-
-
 def buck_converter_plate() -> trimesh.Trimesh:
     plate = box((72, 42, 4), (0, 0, 2))
     cutters = [
@@ -367,18 +322,6 @@ def cargo_shelf_support_block() -> trimesh.Trimesh:
     return difference(block, cutters)
 
 
-def cargo_retainer_long_rail() -> trimesh.Trimesh:
-    rail = box((224, 8, D.cargo_rail_h), (0, 0, D.cargo_rail_h / 2))
-    cutters = [cyl_z(1.7, D.cargo_rail_h + 4, (x, 0, D.cargo_rail_h / 2), 24) for x in [-88, 0, 88]]
-    return difference(rail, cutters)
-
-
-def cargo_retainer_short_rail() -> trimesh.Trimesh:
-    rail = box((8, 156, D.cargo_rail_h), (0, 0, D.cargo_rail_h / 2))
-    cutters = [cyl_z(1.7, D.cargo_rail_h + 4, (0, y, D.cargo_rail_h / 2), 24) for y in [-58, 58]]
-    return difference(rail, cutters)
-
-
 def food_box_placeholder() -> trimesh.Trimesh:
     return box((D.max_food_box_len, D.max_food_box_w, D.max_food_box_h), (0, 0, D.max_food_box_h / 2))
 
@@ -410,22 +353,6 @@ def front_rear_panel(front: bool, side: str) -> trimesh.Trimesh:
     seam_x = 53 if side == "left" else -53
     for y in [28, 78, 128]:
         cutters.append(cyl_z(1.7, D.panel_t + 8, (seam_x, y, D.panel_t / 2), 24))
-    if front:
-        # HC-SR04 openings: two transducer holes and two small module screws.
-        sensor_x = -14 if side == "left" else 14
-        for dx in [-13, 13]:
-            cutters.append(cyl_z(8.5, D.panel_t + 8, (sensor_x + dx, 72, D.panel_t / 2), 48))
-        for dx in [-23, 23]:
-            cutters.append(cyl_z(1.35, D.panel_t + 8, (sensor_x + dx, 93, D.panel_t / 2), 24))
-        # Front LED diffuser slot, split across the two front panels.
-        cutters.append(slot_cut_z(0, 126, 96, 8, D.panel_t / 2, D.panel_t + 8))
-        # Camera mount holes are split across the front panel halves.
-        for x in [-34, 34]:
-            cutters.append(cyl_z(1.7, D.panel_t + 8, (x, 112, D.panel_t / 2), 24))
-    else:
-        # Rear camera mount holes.
-        for x in [-34, 34]:
-            cutters.append(cyl_z(1.7, D.panel_t + 8, (x, 112, D.panel_t / 2), 24))
     return difference(mesh, cutters)
 
 
@@ -463,100 +390,6 @@ def lid_quadrant() -> trimesh.Trimesh:
     return difference(mesh, holes)
 
 
-def camera_module_mount() -> trimesh.Trimesh:
-    plate = box((D.camera_mount_w, D.camera_mount_h, D.camera_mount_t), (0, 0, D.camera_mount_t / 2))
-    shade = box((D.camera_mount_w, 8, 9), (0, D.camera_mount_h / 2 - 4, D.camera_mount_t + 4.5))
-    side_lips = [
-        box((5, D.camera_mount_h, 7), (D.camera_mount_w / 2 - 2.5, 0, D.camera_mount_t + 3.5)),
-        box((5, D.camera_mount_h, 7), (-D.camera_mount_w / 2 + 2.5, 0, D.camera_mount_t + 3.5)),
-    ]
-    mesh = union([plate, shade, *side_lips])
-    cutters = [
-        cyl_z(8.5, D.camera_mount_t + 16, (0, 0, D.camera_mount_t / 2), 48),
-        cyl_z(1.2, D.camera_mount_t + 16, (-10.5, -10.5, D.camera_mount_t / 2), 24),
-        cyl_z(1.2, D.camera_mount_t + 16, (10.5, -10.5, D.camera_mount_t / 2), 24),
-        cyl_z(1.2, D.camera_mount_t + 16, (-10.5, 10.5, D.camera_mount_t / 2), 24),
-        cyl_z(1.2, D.camera_mount_t + 16, (10.5, 10.5, D.camera_mount_t / 2), 24),
-        cyl_z(1.7, D.camera_mount_t + 16, (-26, 15, D.camera_mount_t / 2), 24),
-        cyl_z(1.7, D.camera_mount_t + 16, (26, 15, D.camera_mount_t / 2), 24),
-        cyl_z(1.7, D.camera_mount_t + 16, (-26, -15, D.camera_mount_t / 2), 24),
-        cyl_z(1.7, D.camera_mount_t + 16, (26, -15, D.camera_mount_t / 2), 24),
-        slot_cut_z(-20, 0, 4, 30, D.camera_mount_t / 2, D.camera_mount_t + 16),
-        slot_cut_z(20, 0, 4, 30, D.camera_mount_t / 2, D.camera_mount_t + 16),
-    ]
-    return difference(mesh, cutters)
-
-
-def micro_servo_lid_lock_mount() -> trimesh.Trimesh:
-    # Flat cradle for an MG90S/SG90-size servo. Zip ties wrap through the slots.
-    base = box((56, 36, 4), (0, 0, 2))
-    side_rails = [
-        box((56, 4, 15), (0, 16, 9.5)),
-        box((56, 4, 15), (0, -16, 9.5)),
-        box((4, 28, 15), (-26, 0, 9.5)),
-    ]
-    boss = box((16, 28, 8), (24, 0, 8))
-    mesh = union([base, *side_rails, boss])
-    cutters = [
-        slot_cut_z(-12, 0, 7, 28, 3, 12),
-        slot_cut_z(10, 0, 7, 28, 3, 12),
-        cyl_z(1.7, 10, (-22, -12, 3), 24),
-        cyl_z(1.7, 10, (-22, 12, 3), 24),
-        cyl_z(1.7, 10, (22, -12, 3), 24),
-        cyl_z(1.7, 10, (22, 12, 3), 24),
-    ]
-    return difference(mesh, cutters)
-
-
-def lid_lock_cam() -> trimesh.Trimesh:
-    cam = union(
-        [
-            cyl_z(9, 4, (0, 0, 2), 48),
-            box((38, 10, 4), (16, 0, 2)),
-        ]
-    )
-    cutters = [
-        cyl_z(1.2, 8, (0, 0, 2), 24),
-        cyl_z(1.0, 8, (5, 0, 2), 16),
-        cyl_z(1.0, 8, (-5, 0, 2), 16),
-    ]
-    return difference(cam, cutters)
-
-
-def lid_lock_keeper() -> trimesh.Trimesh:
-    plate = box((70, 18, 4), (0, 0, 2))
-    catch_lip = box((42, 5, 8), (0, -6.5, 8))
-    mesh = union([plate, catch_lip])
-    cutters = [
-        cyl_z(1.7, 14, (-25, 0, 3), 24),
-        cyl_z(1.7, 14, (25, 0, 3), 24),
-        slot_cut_z(0, 3, 30, 7, 4, 16),
-    ]
-    return difference(mesh, cutters)
-
-
-def wheel_cap() -> trimesh.Trimesh:
-    cap = cyl_z(50, 4, (0, 0, 2), 96)
-    hub_recess = cyl_z(13, 8, (0, 0, 2), 64)
-    screw_holes = []
-    for a in np.linspace(0, math.tau, 6, endpoint=False):
-        screw_holes.append(cyl_z(1.7, 10, (12 * math.cos(a), 12 * math.sin(a), 2), 24))
-    return difference(cap, [hub_recess, *screw_holes])
-
-
-def led_diffuser() -> trimesh.Trimesh:
-    # Print in clear/translucent PETG or natural PLA.
-    bar = box((230, 6, 2.4), (0, 0, 1.2))
-    return bar
-
-
-def motor_spacer() -> trimesh.Trimesh:
-    block = box((62, 18, 8), (0, 0, 4))
-    cutters = [slot_cut_z(x, 0, 8, 14, 4, 12) for x in [-22, 22]]
-    cutters.append(cyl_axis("y", 19, 28, (0, 0, 4), 64))
-    return difference(block, cutters)
-
-
 def load_existing_original_base() -> trimesh.Trimesh | None:
     parts = sorted((ROOT / "3D Prints").glob("*.stl"))
     if not parts:
@@ -589,41 +422,18 @@ def add_cargo_bay_parts(parts: list[trimesh.Trimesh], include_food_box: bool) ->
     floor_top = floor_z + D.cargo_floor_t
     parts.append(transform_copy(cargo_floor, (0, 0, floor_z)))
 
-    long_rail = cargo_retainer_long_rail()
-    short_rail = cargo_retainer_short_rail()
-    for sy in [-1, 1]:
-        parts.append(transform_copy(long_rail, (0, sy * 82, floor_top)))
-    for sx in [-1, 1]:
-        parts.append(transform_copy(short_rail, (sx * 114, 0, floor_top)))
-
     if include_food_box:
         parts.append(transform_copy(food_box_placeholder(), (0, 0, floor_top + 2)))
-
-
-def add_v2_feature_mounts(parts: list[trimesh.Trimesh]) -> None:
-    camera = camera_module_mount()
-    front_camera = transform_copy(camera, rotation=(math.pi / 2, [0, 1, 0]))
-    front_camera.apply_translation((D.body_len / 2 + 8, 0, D.base_t + 118))
-    rear_camera = transform_copy(camera, rotation=(-math.pi / 2, [0, 1, 0]))
-    rear_camera.apply_translation((-D.body_len / 2 - 8, 0, D.base_t + 118))
-    parts.extend([front_camera, rear_camera])
-
-    servo = transform_copy(micro_servo_lid_lock_mount(), rotation=(math.pi / 2, [0, 1, 0]))
-    servo.apply_translation((-D.body_len / 2 + 20, 0, D.base_t + D.body_h - 34))
-    keeper = transform_copy(lid_lock_keeper(), rotation=(math.pi / 2, [0, 1, 0]))
-    keeper.apply_translation((-D.body_len / 2 + 4, 0, D.base_t + D.body_h - 10))
-    cam = transform_copy(lid_lock_cam(), rotation=(math.pi / 2, [0, 1, 0]))
-    cam.apply_translation((-D.body_len / 2 + 2, 0, D.base_t + D.body_h - 30))
-    parts.extend([servo, keeper, cam])
 
 
 def electronics_layout_assembly(base: trimesh.Trimesh) -> trimesh.Trimesh:
     parts: list[trimesh.Trimesh] = [base]
     parts.append(transform_copy(battery_sled(), (-66, 0, D.base_t)))
-    parts.append(transform_copy(pi_companion_tray(), (58, 58, D.base_t)))
-    parts.append(transform_copy(electronics_tray((145, 92), [(-52, -28), (45, -28), (-52, 26), (45, 26)], [(-5, -40, 92, 6), (-5, 39, 92, 6)]), (54, -64, D.base_t)))
-    parts.append(transform_copy(lte_modem_tray(), (-90, 72, D.base_t)))
-    parts.append(transform_copy(telemetry_sensor_plate(), (-92, -56, D.base_t)))
+    parts.append(transform_copy(electronics_tray((145, 92), [(-52, -28), (45, -28), (-52, 26), (45, 26)], [(-5, -40, 92, 6), (-5, 39, 92, 6)]), (58, 58, D.base_t)))
+    driver_bosses = [(-48, -25), (-2, -25), (48, -25), (-48, 25), (-2, 25), (48, 25)]
+    driver_tray = electronics_tray((136, 72), driver_bosses, [(0, 0, 118, 6)])
+    parts.append(transform_copy(driver_tray, (58, -58, D.base_t)))
+    parts.append(transform_copy(driver_tray, (-92, -58, D.base_t)))
     parts.append(transform_copy(buck_converter_plate(), (-8, 0, D.base_t)))
     return combine(parts)
 
@@ -675,8 +485,6 @@ def reference_assembly(base: trimesh.Trimesh, include_lid: bool = True, include_
                 p = transform_copy(lid, (sx * D.body_len / 4, sy * D.body_w / 4, D.base_t + D.body_h))
                 parts.append(p)
 
-    add_v2_feature_mounts(parts)
-
     return combine(parts)
 
 
@@ -694,7 +502,7 @@ def render_meshes(
     faces_payload = []
     offset = 0
     for idx, mesh in enumerate(meshes):
-        verts = np.asarray(mesh.vertices)
+        verts = np.asarray(mesh.vertices, dtype=np.float64).copy()
         faces = np.asarray(mesh.faces)
         verts_all.append(verts)
         faces_payload.append((faces + offset, idx))
@@ -719,7 +527,7 @@ def render_meshes(
             [0, math.sin(pitch), math.cos(pitch)],
         ]
     )
-    camera = vertices @ rz.T @ rx.T
+    camera = np.einsum("ij,jk,kl->il", vertices, rz.T, rx.T)
     xy = camera[:, :2]
     span = np.ptp(xy, axis=0).max()
     scale = min(size) * 0.78 / span
@@ -760,17 +568,42 @@ def render_meshes(
 
 
 def write_manifest(paths: list[Path]) -> None:
+    critical_dimension_names = [
+        "base_len",
+        "base_w",
+        "base_t",
+        "wheel_d",
+        "wheel_w",
+        "motor_d",
+        "motor_len",
+        "motor_shaft_d",
+        "motor_shaft_len",
+        "body_len",
+        "body_w",
+        "body_h",
+        "panel_t",
+        "post_size",
+        "lid_t",
+        "cargo_floor_len",
+        "cargo_floor_w",
+        "cargo_floor_t",
+        "cargo_floor_z",
+        "cargo_support_hole_z",
+        "max_food_box_len",
+        "max_food_box_w",
+        "max_food_box_h",
+    ]
     payload = {
         "units": "millimeters",
         "coordinate_system": "assembled reference uses X=front/rear, Y=left/right, Z=up; print files are already laid flat where practical",
         "generated_files": [str(p.relative_to(ROOT)) for p in paths],
-        "critical_dimensions": D.__dict__,
+        "critical_dimensions": {name: getattr(D, name) for name in critical_dimension_names},
     }
     (CAD_ROOT / "source" / "generated_manifest.json").write_text(json.dumps(payload, indent=2) + "\n")
 
 
 def main() -> None:
-    ensure_dirs()
+    reset_generated_outputs()
     generated: list[Path] = []
 
     original = load_existing_original_base()
@@ -784,7 +617,6 @@ def main() -> None:
 
     generated.append(export(seam_joiner(155, "long"), "chassis/base_seam_joiner_long_print_2.stl"))
     generated.append(export(seam_joiner(145, "short"), "chassis/base_seam_joiner_short_print_2.stl"))
-    generated.append(export(motor_spacer(), "chassis/printed_37d_motor_spacer_print_4.stl"))
 
     generated.append(
         export(
@@ -804,52 +636,43 @@ def main() -> None:
         )
     )
     generated.append(export(battery_sled(), "electronics/3s_lipo_battery_sled.stl"))
-    generated.append(export(pi_companion_tray(), "electronics/raspberry_pi_companion_tray.stl"))
-    generated.append(export(lte_modem_tray(), "electronics/usb_lte_modem_tray.stl"))
-    generated.append(export(telemetry_sensor_plate(), "electronics/battery_telemetry_sensor_plate.stl"))
-    generated.append(export(buck_converter_plate(), "electronics/buck_converter_plate_print_2.stl"))
+    generated.append(export(buck_converter_plate(), "electronics/buck_converter_plate.stl"))
 
     cargo_floor = cargo_floor_full()
     for name, mesh in split_cargo_floor(cargo_floor).items():
         generated.append(export(mesh, f"cargo/{name}"))
     generated.append(export(cargo_shelf_support_block(), "cargo/cargo_shelf_support_block_print_4.stl"))
-    generated.append(export(cargo_retainer_long_rail(), "cargo/cargo_retainer_long_rail_print_2.stl"))
-    generated.append(export(cargo_retainer_short_rail(), "cargo/cargo_retainer_short_rail_print_2.stl"))
 
     generated.append(export(side_panel("front"), "body/side_panel_front_half_print_2.stl"))
     generated.append(export(side_panel("rear"), "body/side_panel_rear_half_print_2.stl"))
-    generated.append(export(front_rear_panel(True, "left"), "body/front_panel_left_hcsr04_led.stl"))
-    generated.append(export(front_rear_panel(True, "right"), "body/front_panel_right_hcsr04_led.stl"))
+    generated.append(export(front_rear_panel(True, "left"), "body/front_panel_left.stl"))
+    generated.append(export(front_rear_panel(True, "right"), "body/front_panel_right.stl"))
     generated.append(export(front_rear_panel(False, "left"), "body/rear_panel_left.stl"))
     generated.append(export(front_rear_panel(False, "right"), "body/rear_panel_right.stl"))
     generated.append(export(corner_post(), "body/corner_post_print_4.stl"))
     generated.append(export(panel_joiner(), "body/panel_center_joiner_print_4.stl"))
     generated.append(export(lid_quadrant(), "body/lid_quadrant_print_4.stl"))
-    generated.append(export(camera_module_mount(), "body/camera_module_mount_print_2.stl"))
-    generated.append(export(micro_servo_lid_lock_mount(), "body/micro_servo_lid_lock_mount.stl"))
-    generated.append(export(lid_lock_cam(), "body/lid_lock_servo_cam.stl"))
-    generated.append(export(lid_lock_keeper(), "body/lid_lock_keeper_plate.stl"))
-
-    generated.append(export(wheel_cap(), "accessories/wheel_white_cap_print_4.stl"))
-    generated.append(export(led_diffuser(), "accessories/front_led_diffuser_clear_print_1.stl"))
 
     assembly = reference_assembly(base)
     generated.append(export(assembly, "full-size/v2_robot_complete_reference_not_for_print.stl"))
+    shutil.copy2(OUT / "full-size/v2_robot_complete_reference_not_for_print.stl", VIEW_OUT / "OPEN_ME_complete_robot_reference.stl")
+    shutil.copy2(OUT / "full-size/v2_base_plate_full_size.stl", VIEW_OUT / "OPEN_ME_full_base_plate_reference.stl")
+
     cargo_open = reference_assembly(base, include_lid=False)
     electronics_layout = electronics_layout_assembly(base)
 
-    render_meshes([assembly], RENDER_OUT / "checkpoint_2_complete_robot_iso.png", "Checkpoint 2: v2.2 complete robot reference")
+    render_meshes([assembly], RENDER_OUT / "checkpoint_2_complete_robot_iso.png", "Checkpoint 2: minimum complete robot reference")
     render_meshes(
         [assembly],
         RENDER_OUT / "checkpoint_2_complete_robot_low_angle.png",
-        "Checkpoint 2: v2.2 low angle wheel/body clearance",
+        "Checkpoint 2: minimum low angle wheel/body clearance",
         yaw_deg=18,
         pitch_deg=8,
     )
     render_meshes(
         [cargo_open],
         RENDER_OUT / "checkpoint_3_cargo_bay_lid_removed.png",
-        "Checkpoint 3: v2.2 lid removed, lock and cargo bay visible",
+        "Checkpoint 3: minimum lid removed and cargo bay visible",
         yaw_deg=32,
         pitch_deg=34,
     )
@@ -857,7 +680,7 @@ def main() -> None:
     render_meshes(
         [electronics_layout],
         RENDER_OUT / "checkpoint_4_electronics_layout.png",
-        "Checkpoint 4: v2.2 electronics layout with Pi, LTE, telemetry",
+        "Checkpoint 4: minimum electronics layout",
         yaw_deg=34,
         pitch_deg=36,
     )
@@ -866,16 +689,10 @@ def main() -> None:
         transform_copy(front_rear_panel(True, "right"), (-55, 0, 0)),
         transform_copy(side_panel("front"), (85, 0, 0)),
         transform_copy(lid_quadrant(), (250, 20, 0)),
-        transform_copy(camera_module_mount(), (360, 0, 0)),
-        transform_copy(micro_servo_lid_lock_mount(), (455, 0, 0)),
     ]
-    render_meshes(sample_parts, RENDER_OUT / "checkpoint_2_printed_panel_samples.png", "Checkpoint 2: v2.2 representative print parts")
+    render_meshes(sample_parts, RENDER_OUT / "checkpoint_2_printed_panel_samples.png", "Checkpoint 2: minimum representative print parts")
     cargo_parts = [
         cargo_floor,
-        transform_copy(cargo_retainer_long_rail(), (0, 82, D.cargo_floor_t)),
-        transform_copy(cargo_retainer_long_rail(), (0, -82, D.cargo_floor_t)),
-        transform_copy(cargo_retainer_short_rail(), (114, 0, D.cargo_floor_t)),
-        transform_copy(cargo_retainer_short_rail(), (-114, 0, D.cargo_floor_t)),
         transform_copy(food_box_placeholder(), (0, 0, D.cargo_floor_t + 2)),
     ]
     render_meshes(cargo_parts, RENDER_OUT / "checkpoint_3_cargo_shelf_and_food_box.png", "Checkpoint 3: cargo shelf and max food box")

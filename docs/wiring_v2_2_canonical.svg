@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" role="img" aria-label="Canonical v2.2 delivery robot wiring diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="Minimum outdoor delivery robot wiring diagram">
   <defs>
     <style>
       .box { fill: #ffffff; stroke: #24313f; stroke-width: 2; rx: 10; }
@@ -6,7 +6,6 @@
       .ground { stroke: #222222; stroke-width: 4; fill: none; marker-end: url(#arrow-black); }
       .logic { stroke: #1565c0; stroke-width: 3; fill: none; marker-end: url(#arrow-blue); }
       .signal { stroke: #2e7d32; stroke-width: 3; fill: none; marker-end: url(#arrow-green); }
-      .usb { stroke: #6a1b9a; stroke-width: 3; fill: none; marker-end: url(#arrow-purple); }
       .label { font: 18px Arial, sans-serif; fill: #16202a; }
       .small { font: 14px Arial, sans-serif; fill: #16202a; }
       .tiny { font: 12px Arial, sans-serif; fill: #16202a; }
@@ -16,100 +15,70 @@
     <marker id="arrow-black" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#222222"/></marker>
     <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#1565c0"/></marker>
     <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#2e7d32"/></marker>
-    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#6a1b9a"/></marker>
   </defs>
 
-  <text x="40" y="42" class="label" style="font-size:28px;font-weight:bold">Delivery Robot V2.2 Canonical Wiring</text>
-  <text x="40" y="70" class="warn">Do not use a solderless breadboard for motor or battery power.</text>
+  <text x="40" y="42" class="label" style="font-size:28px;font-weight:bold">Minimum Outdoor Delivery Robot Wiring</text>
+  <text x="40" y="70" class="warn">No solderless breadboard. Fuse stays close to battery positive. Use drip loops and grommets outdoors.</text>
 
-  <rect class="box" x="40" y="110" width="150" height="70"/>
-  <text class="label" x="62" y="142">3S LiPo</text>
-  <text class="small" x="62" y="164">XT60, 11.1 V</text>
+  <rect class="box" x="40" y="115" width="150" height="70"/>
+  <text class="label" x="62" y="147">3S LiPo</text>
+  <text class="small" x="62" y="169">XT60, 11.1 V</text>
 
-  <rect class="box" x="250" y="110" width="130" height="70"/>
-  <text class="label" x="286" y="142">Fuse</text>
-  <text class="small" x="272" y="164">25 A blade</text>
+  <rect class="box" x="245" y="115" width="130" height="70"/>
+  <text class="label" x="281" y="147">Fuse</text>
+  <text class="small" x="267" y="169">25 A blade</text>
 
-  <rect class="box" x="430" y="110" width="150" height="70"/>
-  <text class="label" x="455" y="142">Switch</text>
-  <text class="small" x="448" y="164">or XT60 key</text>
+  <rect class="box" x="430" y="115" width="150" height="70"/>
+  <text class="label" x="455" y="147">Switch</text>
+  <text class="small" x="448" y="169">or XT60 key</text>
 
-  <rect class="box" x="630" y="110" width="170" height="70"/>
-  <text class="label" x="660" y="142">ACS724</text>
-  <text class="small" x="650" y="164">0-30 A sensor</text>
+  <rect class="box" x="650" y="100" width="260" height="100"/>
+  <text class="label" x="702" y="135">Power Distribution</text>
+  <text class="small" x="683" y="160">positive and negative blocks</text>
+  <text class="tiny" x="700" y="182">common ground, real terminals</text>
 
-  <rect class="box" x="860" y="95" width="250" height="100"/>
-  <text class="label" x="905" y="130">Power Distribution</text>
-  <text class="small" x="890" y="154">positive and negative blocks</text>
-  <text class="tiny" x="890" y="176">common ground, no breadboard</text>
+  <path class="power" d="M190 137 H245"/>
+  <path class="power" d="M375 137 H430"/>
+  <path class="power" d="M580 137 H650"/>
+  <path class="ground" d="M190 170 C320 240, 520 240, 650 173"/>
 
-  <path class="power" d="M190 132 H250"/>
-  <path class="power" d="M380 132 H430"/>
-  <path class="power" d="M580 132 H630"/>
-  <path class="power" d="M800 132 H860"/>
-  <path class="ground" d="M190 166 C350 235, 680 235, 860 170"/>
+  <rect class="box" x="70" y="315" width="220" height="105"/>
+  <text class="label" x="112" y="348">4 x BTS7960</text>
+  <text class="small" x="103" y="372">one driver per motor</text>
+  <text class="tiny" x="103" y="396">B+ and B- from distribution</text>
 
-  <rect class="box" x="80" y="305" width="210" height="105"/>
-  <text class="label" x="120" y="338">4 x BTS7960</text>
-  <text class="small" x="112" y="362">one driver per motor</text>
-  <text class="tiny" x="112" y="386">B+ and B- from distro</text>
+  <rect class="box" x="385" y="310" width="220" height="115"/>
+  <text class="label" x="448" y="343">Arduino Mega</text>
+  <text class="small" x="424" y="368">serial drive pulses</text>
+  <text class="small" x="424" y="388">stop and battery cutoff</text>
 
-  <rect class="box" x="360" y="300" width="200" height="115"/>
-  <text class="label" x="412" y="333">Arduino Mega</text>
-  <text class="small" x="392" y="358">motor control, lock,</text>
-  <text class="small" x="392" y="378">encoders, telemetry</text>
+  <rect class="box" x="710" y="318" width="210" height="88"/>
+  <text class="label" x="755" y="352">5 V Buck</text>
+  <text class="small" x="747" y="376">Arduino and BTS logic</text>
 
-  <rect class="box" x="640" y="292" width="200" height="65"/>
-  <text class="label" x="675" y="326">5 V Logic Buck</text>
-  <text class="small" x="675" y="348">Arduino, BTS logic, servo</text>
+  <rect class="box" x="950" y="305" width="190" height="125"/>
+  <text class="label" x="990" y="338">4 Motors</text>
+  <text class="small" x="982" y="364">M+ and M- from</text>
+  <text class="small" x="982" y="384">BTS7960 outputs</text>
 
-  <rect class="box" x="640" y="390" width="200" height="65"/>
-  <text class="label" x="690" y="424">5 V Pi Buck</text>
-  <text class="small" x="682" y="446">Pi, cameras, LTE</text>
+  <path class="power" d="M780 200 V318"/>
+  <path class="power" d="M780 200 C745 275, 310 286, 180 315"/>
+  <path class="logic" d="M710 362 H605"/>
+  <path class="signal" d="M605 362 H710"/>
+  <path class="power" d="M290 360 H950"/>
 
-  <rect class="box" x="910" y="300" width="190" height="115"/>
-  <text class="label" x="945" y="333">Raspberry Pi</text>
-  <text class="small" x="948" y="358">USB to Arduino</text>
-  <text class="small" x="948" y="378">video and LTE host</text>
+  <rect class="box" x="160" y="555" width="245" height="95"/>
+  <text class="label" x="218" y="588">Battery Sense</text>
+  <text class="small" x="190" y="612">100k / 33k divider to A0</text>
+  <text class="tiny" x="200" y="634">sense only, powers nothing</text>
 
-  <path class="power" d="M985 195 V260 C985 280, 835 282, 740 292"/>
-  <path class="power" d="M985 195 V272 C985 372, 835 378, 740 390"/>
-  <path class="power" d="M985 195 V255 C985 300, 290 278, 185 305"/>
-  <path class="logic" d="M640 326 H560"/>
-  <path class="usb" d="M910 350 H560"/>
+  <rect class="box" x="475" y="555" width="285" height="95"/>
+  <text class="label" x="552" y="588">External Stop</text>
+  <text class="small" x="510" y="612">D42 normally closed to GND</text>
+  <text class="tiny" x="514" y="634">pressed or broken wire = lockout</text>
 
-  <rect class="box" x="80" y="530" width="190" height="95"/>
-  <text class="label" x="122" y="562">4 Encoders</text>
-  <text class="small" x="105" y="586">A: D18-D21</text>
-  <text class="small" x="105" y="606">B: D34-D37</text>
+  <path class="signal" d="M405 604 H475"/>
+  <path class="signal" d="M617 555 V425"/>
 
-  <rect class="box" x="335" y="530" width="190" height="95"/>
-  <text class="label" x="378" y="562">Lid Servo</text>
-  <text class="small" x="366" y="586">signal D44</text>
-  <text class="small" x="366" y="606">5 V accessory rail</text>
-
-  <rect class="box" x="590" y="530" width="220" height="95"/>
-  <text class="label" x="630" y="562">Battery Telemetry</text>
-  <text class="small" x="620" y="586">A0 voltage divider</text>
-  <text class="small" x="620" y="606">A1 ACS724 output</text>
-
-  <rect class="box" x="890" y="515" width="240" height="130"/>
-  <text class="label" x="938" y="548">USB Peripherals</text>
-  <text class="small" x="922" y="574">front USB/UVC camera</text>
-  <text class="small" x="922" y="596">rear USB/UVC camera</text>
-  <text class="small" x="922" y="618">USB LTE modem + SIM</text>
-  <text class="tiny" x="922" y="638">skip desk hub initially</text>
-
-  <rect class="box" x="335" y="660" width="330" height="95"/>
-  <text class="label" x="395" y="692">Safety Inputs</text>
-  <text class="small" x="365" y="716">D42 external stop, NC to GND</text>
-  <text class="small" x="365" y="738">D43 lid closed switch to GND</text>
-
-  <path class="signal" d="M270 575 H360"/>
-  <path class="signal" d="M525 575 H590"/>
-  <path class="signal" d="M700 530 V415"/>
-  <path class="signal" d="M500 660 V415"/>
-  <path class="usb" d="M1010 515 V415"/>
-
-  <text class="tiny" x="42" y="835">Red = battery power, black = ground, blue = regulated 5 V logic, green = Arduino signal, purple = USB.</text>
+  <text class="tiny" x="42" y="720">Red = battery power, black = ground, blue = regulated 5 V logic, green = Arduino signal.</text>
 </svg>
