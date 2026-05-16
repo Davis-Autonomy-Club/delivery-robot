@@ -34,6 +34,10 @@ The one-piece `cad/print-ready/full-size/v2_base_plate_full_size.stl` is include
 | `cad/print-ready/electronics/arduino_mega_controller_tray.stl` | 1 | Mega tray with slotted tie-downs and M3 standoff holes |
 | `cad/print-ready/electronics/bts7960_dual_driver_tray_print_2.stl` | 2 | Holds two BTS7960 modules per tray |
 | `cad/print-ready/electronics/3s_lipo_battery_sled.stl` | 1 | Fits typical 3S 3500 mAh pack with two Velcro straps |
+| `cad/print-ready/electronics/raspberry_pi_companion_tray.stl` | 1 | Raspberry Pi companion-computer tray for camera/LTE/teleop host |
+| `cad/print-ready/electronics/usb_lte_modem_tray.stl` | 1 | Strap-down tray for a compact USB LTE modem |
+| `cad/print-ready/electronics/battery_telemetry_sensor_plate.stl` | 1 | Mounting plate for ACS724 current sensor and voltage-divider board |
+| `cad/print-ready/electronics/buck_converter_plate_print_2.stl` | 2 | Two 5 V buck plates: logic/accessory rail and Pi/camera/LTE rail |
 
 ## Cargo Bay
 
@@ -64,6 +68,10 @@ Maximum food-safe container outer size: 205 x 145 x 70 mm. Use a sealed food-saf
 | `cad/print-ready/body/corner_post_print_4.stl` | 4 | Four vertical body posts |
 | `cad/print-ready/body/panel_center_joiner_print_4.stl` | 4 | Center seams for front, rear, left, right panels |
 | `cad/print-ready/body/lid_quadrant_print_4.stl` | 4 | Four-piece removable top lid |
+| `cad/print-ready/body/camera_module_mount_print_2.stl` | 2 | Front and rear USB/UVC camera mounts with M2 holes and zip-tie slots |
+| `cad/print-ready/body/micro_servo_lid_lock_mount.stl` | 1 | MG90S/SG90-size servo cradle for programmatic lid lock |
+| `cad/print-ready/body/lid_lock_servo_cam.stl` | 1 | Printed cam that attaches to the micro-servo horn |
+| `cad/print-ready/body/lid_lock_keeper_plate.stl` | 1 | Catch plate that the servo cam rotates under when locked |
 
 ## Accessories
 
@@ -83,3 +91,4 @@ Maximum food-safe container outer size: 205 x 145 x 70 mm. Use a sealed food-saf
 | `cad/renders/checkpoint_2_printed_panel_samples.png` | Rendered print-part sample check |
 | `cad/renders/checkpoint_3_cargo_bay_lid_removed.png` | Rendered cargo-bay check with lid removed |
 | `cad/renders/checkpoint_3_cargo_shelf_and_food_box.png` | Rendered cargo shelf with max-size food box placeholder |
+| `cad/renders/checkpoint_4_electronics_layout.png` | Rendered v2.1 electronics layout with Pi, LTE, telemetry, and buck plates |

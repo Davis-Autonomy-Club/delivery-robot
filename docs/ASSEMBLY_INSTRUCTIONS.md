@@ -1,12 +1,15 @@
 # Assembly Instructions
 
-Follow this in order. Do not install the battery until the wiring checklist tells you to.
+Follow this in order. Do not install or plug in the LiPo battery until the wiring checklist tells you to.
+
+The canonical wiring source is [`docs/CANONICAL_WIRING_V2.md`](CANONICAL_WIRING_V2.md). The old root-level wiring image is legacy and incomplete.
 
 ## Orientation
 
 Use this convention for the whole build:
 
-- Front: the side with the two HC-SR04 sensor openings and LED diffuser.
+- Front: the side with the HC-SR04 openings, LED diffuser, and front camera.
+- Rear: the side with the rear camera and lid-lock servo.
 - Left/right: the robot's left and right when you stand behind it and look forward.
 - Motors: `L1` = front-left, `L2` = rear-left, `R1` = front-right, `R2` = rear-right.
 
@@ -15,9 +18,10 @@ Use this convention for the whole build:
 Print the files listed in `cad/PRINT_MANIFEST.md`. After printing:
 
 1. Confirm the four base plates are flat and not curled.
-2. Test an M3 screw through every base seam hole, panel hole, and corner-post hole. Clear tight holes with a 3.0-3.2 mm drill bit by hand.
+2. Test an M3 screw through every base seam hole, panel hole, corner-post hole, tray hole, and camera-mount hole. Clear tight holes with a 3.0-3.2 mm drill bit by hand.
 3. Dry-fit the four base plates on a table. The total base should be about 322 x 328 mm.
-4. Check the renders in `cad/renders/` against your printed parts so you know what the final shape should look like.
+4. Confirm the new v2.1 parts are present: camera mount, servo lock mount, lock cam, lock keeper, Raspberry Pi tray, LTE tray, telemetry plate, and two buck-converter plates.
+5. Check the renders in `cad/renders/` against your printed parts so you know what the final shape should look like.
 
 ## 2. Assemble The Base
 
@@ -39,11 +43,11 @@ Steps:
 4. Insert M3 x 12 screws from the top of the base, through the base and joiner bars. Add washers and nyloc nuts underneath.
 5. Tighten until snug. Stop when the plastic stops moving; do not crush the printed parts.
 
-## 3. Install Motors, Brackets, Adapters, And Wheels
+## 3. Install Encoder Motors, Adapters, And Wheels
 
 Parts:
 
-- 4 x 37D gearmotors
+- 4 x Pololu #4752-style 37D encoder gearmotors
 - 4 x metal 37D motor brackets
 - 4 x 12 mm hex adapters for 6 mm shafts
 - 4 x 120 mm wheels
@@ -53,11 +57,12 @@ Steps:
 
 1. Attach each 37D motor to a metal bracket using the bracket manufacturer's screws. For Pololu 37D motors, do not drive screws deeper into the gearbox than the bracket instructions allow.
 2. Place one bracket at each base corner. The motor shaft must point outward, away from the body.
-3. Loosely bolt each bracket through the slotted holes in the base using M3 screws, washers, and nyloc nuts.
-4. Slide a 12 mm hex adapter onto each 6 mm motor shaft. Put one set screw against the flat of the D shaft. Tighten both set screws.
-5. Install the wheels on the adapters using the adapter's supplied wheel screw.
-6. Put the robot on a flat table. Adjust the bracket slots until all four wheels touch the table evenly and do not rub the base.
-7. Tighten the bracket bolts. Add the printed 37D motor spacers under the motor barrels if the motors vibrate or sag; hold spacers with zip ties through the nearby cable slots.
+3. Route the encoder cable inward through the nearest base slot before fully tightening the bracket.
+4. Loosely bolt each bracket through the slotted holes in the base using M3 screws, washers, and nyloc nuts.
+5. Slide a 12 mm hex adapter onto each 6 mm motor shaft. Put one set screw against the flat of the D shaft. Tighten both set screws.
+6. Install the wheels on the adapters using the adapter's supplied wheel screw.
+7. Put the robot on a flat table. Adjust the bracket slots until all four wheels touch the table evenly and do not rub the base.
+8. Tighten the bracket bolts. Add the printed 37D motor spacers under the motor barrels if the motors vibrate or sag; hold spacers with zip ties through nearby cable slots.
 
 ## 4. Mount The Electronics
 
@@ -66,42 +71,73 @@ Parts:
 - Arduino Mega tray
 - 2 x BTS7960 dual-driver trays
 - Battery sled
+- Raspberry Pi companion tray
+- USB LTE modem tray
+- Battery telemetry sensor plate
+- 2 x buck-converter plates
 - Arduino Mega
 - 4 x BTS7960 driver modules
-- Buck converter
-- Fuse holder, switch, and terminal/distribution blocks
+- Raspberry Pi
+- USB LTE modem
+- Pololu ACS724 current sensor
+- 2 x 5 V buck converters
+- Fuse holder, switch or XT60 loop key, and terminal/distribution blocks
 
 Suggested layout:
 
-- Battery sled: centered on the base, low and forward/rear balanced.
-- Arduino Mega tray: centered and easy to reach from the top lid.
+- Battery sled: centered on the base, low and balanced.
+- Arduino Mega tray: centered and reachable from the top.
 - BTS7960 trays: one tray for left-side motors, one tray for right-side motors.
+- Raspberry Pi tray: away from the motor-driver heat sinks, with USB ports reachable.
+- LTE modem tray: high enough for antenna/cable clearance, away from motor power wiring.
+- Telemetry plate: near the fuse/switch and distribution blocks.
 - Fuse and switch: close to battery positive, reachable through the lid.
-- Buck converter: near Arduino, with airflow and no metal touching the board underside.
+- Buck converters: one for Arduino/BTS logic/servo, one for Pi/cameras/LTE.
 
 Steps:
 
-1. Bolt the printed trays to the base through convenient base holes or zip-tie them through the printed slots.
+1. Bolt or zip-tie the printed trays to the base through convenient base holes or printed slots.
 2. Mount the Arduino Mega on nylon M3 standoffs in the Arduino tray.
 3. Mount two BTS7960 modules on each driver tray. If your modules' mounting holes do not match, use zip ties through the tray slots.
-4. Strap the battery into the sled with two Velcro straps, but leave it unplugged.
-5. Route motor wires through the corner cable slots toward the matching driver tray.
+4. Mount the Raspberry Pi on standoffs in the Pi tray.
+5. Mount or strap the USB LTE modem into the LTE tray.
+6. Mount the ACS724 current sensor and the voltage-divider perfboard on the telemetry plate.
+7. Mount both buck converters to the buck plates.
+8. Strap the battery into the sled with two Velcro straps, but leave it unplugged.
+9. Route motor wires and encoder wires through the corner cable slots toward the matching driver tray and Arduino.
 
 ## 5. Power Wiring
 
-Keep all battery wiring unplugged while building.
+Keep the battery unplugged while building.
+
+Important: do not use a solderless breadboard for any motor or battery power. Use real wire, crimped or soldered joints, distribution blocks, and strain relief.
+
+High-current path:
 
 1. Battery XT60 positive goes to the inline fuse holder.
 2. Fuse holder output goes to the main switch or XT60 loop key.
-3. Switch output goes to the positive distribution block.
-4. Battery XT60 negative goes directly to the negative distribution block.
-5. Every BTS7960 `B+` terminal connects to positive distribution with 14-18 AWG wire.
-6. Every BTS7960 `B-` terminal connects to negative distribution with 14-18 AWG wire.
-7. Buck converter input positive/negative connects to the same positive/negative distribution.
-8. Before connecting the buck to the Arduino, use a multimeter and adjust the buck output to 5.0-5.1 V.
-9. Buck 5 V output powers the Arduino Mega `5V` pin and the BTS7960 logic `Vcc` pins. Buck ground powers Arduino `GND` and all BTS7960 `Gnd` pins.
+3. Switch output goes to ACS724 `IP+`.
+4. ACS724 `IP-` goes to the positive distribution block.
+5. Battery XT60 negative goes directly to the negative distribution block.
+6. Every BTS7960 `B+` terminal connects to positive distribution with 14-18 AWG wire.
+7. Every BTS7960 `B-` terminal connects to negative distribution with 14-18 AWG wire.
+8. Logic/accessory buck input positive/negative connects to the distribution blocks.
+9. Pi/camera/LTE buck input positive/negative connects to the distribution blocks.
 
-Important: all grounds must be common. Battery negative, buck negative, Arduino ground, and all BTS7960 grounds must connect together.
+5 V outputs:
+
+1. Before connecting electronics, use a multimeter and adjust both bucks to 5.0-5.1 V.
+2. Logic/accessory buck 5 V powers Arduino Mega `5V`, all BTS7960 `Vcc` pins, lid servo red wire, ACS724 `VCC`, and the top of the encoder 5 V rail.
+3. Logic/accessory buck ground powers Arduino `GND`, all BTS7960 `Gnd` pins, lid servo ground, ACS724 ground, encoder grounds, and voltage-divider ground.
+4. Pi/camera/LTE buck powers the Raspberry Pi through a USB-C power pigtail/breakout or equivalent 5 V input method. Do not feed raw 3S battery voltage to the Pi.
+5. The two 5 V positive rails stay separate. Their grounds are common.
+
+Battery voltage divider:
+
+1. Solder a 100 kOhm resistor from switched battery positive to Arduino A0.
+2. Solder a 33 kOhm resistor from Arduino A0 to common ground.
+3. Heat-shrink the divider and mount it on the telemetry plate.
+4. This divider is only for sensing. It must not power anything.
 
 ## 6. Motor Output Wiring
 
@@ -118,7 +154,7 @@ If a wheel spins backward during testing, swap that motor's `M+` and `M-` wires 
 
 ## 7. Arduino Signal Wiring
 
-Wire the BTS7960 control header exactly like this:
+### BTS7960 Control Pins
 
 | Driver | RPWM | LPWM | R_EN | L_EN | R_IS | L_IS |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -129,23 +165,42 @@ Wire the BTS7960 control header exactly like this:
 
 For every driver:
 
-- BTS7960 `Vcc` goes to the regulated 5 V logic rail.
-- BTS7960 `Gnd` goes to the common ground rail.
+- BTS7960 `Vcc` goes to the regulated logic/accessory 5 V rail.
+- BTS7960 `Gnd` goes to common ground.
 - Use 22-26 AWG signal wire.
-- Keep signal wires away from the motor power wires where practical.
+- Keep signal wires away from motor power wires where practical.
 
-## 8. Optional Sensors And Lights
+### Encoder Pins
 
-The CAD includes front openings for two HC-SR04 modules. A simple wiring plan:
+| Encoder | A channel | B channel |
+| --- | ---: | ---: |
+| `L1` front-left | D18 | D34 |
+| `L2` rear-left | D19 | D35 |
+| `R1` front-right | D20 | D36 |
+| `R2` rear-right | D21 | D37 |
 
-| Sensor | VCC | GND | TRIG | ECHO |
-| --- | --- | --- | ---: | ---: |
-| Front-left HC-SR04 | 5 V | GND | D30 | D31 |
-| Front-right HC-SR04 | 5 V | GND | D32 | D33 |
+Each encoder also needs 5 V and ground from the logic/accessory rail. The sketch uses interrupts on the A channels and reads B channels for direction.
 
-The current sketch does not use the ultrasonic sensors; these pins are reserved so you can add obstacle logic later without rewiring the body.
+### Telemetry And Lid Lock
 
-For the front LED slot, use a 5 V strip behind `front_led_diffuser_clear_print_1.stl`. Power it from the 5 V rail only if your buck converter has enough current margin.
+| Function | Signal pin |
+| --- | ---: |
+| Lid-lock servo | D44 |
+| Battery voltage divider | A0 |
+| ACS724 current sensor `VIOUT` | A1 |
+
+The lid-lock servo gets power from the logic/accessory 5 V buck, not from a weak USB-only Arduino connection.
+
+## 8. Cameras, LTE, And Pi Link
+
+1. Bolt the front and rear camera mounts to the matching body panels using M3 hardware.
+2. Install one USB/UVC camera in each mount. Use M2 screws if the board holes line up; otherwise use zip ties through the camera-mount slots.
+3. Connect both cameras to the Raspberry Pi.
+4. Install the USB LTE modem in its tray and connect it to the Pi.
+5. Install the activated SIM in the LTE modem.
+6. Connect the Arduino Mega to the Pi by USB. The Arduino sketch uses 9600 baud serial.
+
+This repo does not yet include the Pi teleop dashboard. The Pi is now mechanically and electrically provisioned so the next software sprint can stream camera video, forward commands to the Arduino, and report telemetry over LTE.
 
 ## 9. Upload The Sketch
 
@@ -154,10 +209,15 @@ For the front LED slot, use a 5 V strip behind `front_led_diffuser_clear_print_1
 3. Open `arduino-wheel-robot-code/arduino-wheel-robot-code.ino`.
 4. Select `Arduino Mega or Mega 2560`.
 5. Select the correct USB port.
-6. If an HC-05 Bluetooth module is connected to pins 0/1, unplug it before uploading.
-7. Upload the sketch.
+6. Upload the sketch.
 
-The sketch accepts these serial commands at 9600 baud: `Forward`, `Reverse`, `Left`, `Right`, `Stop`. Short forms also work: `F`, `B`, `L`, `R`, `S`.
+The sketch accepts these serial commands at 9600 baud: `Forward`, `Reverse`, `Left`, `Right`, `Stop`, `LOCK`, `UNLOCK`, `STATUS`, and `ZEROENC`. Short drive forms also work: `F`, `B`, `L`, `R`, `S`.
+
+Telemetry prints once per second:
+
+```text
+TEL,V=12.10,I=1.25,LOW=0,LOCK=1,ENC=123/121/119/124
+```
 
 ## 10. First Power Test
 
@@ -165,17 +225,22 @@ Do this with the robot on blocks so the wheels are off the table.
 
 1. Confirm the fuse is installed.
 2. Confirm battery polarity with a multimeter before plugging in the battery.
-3. Turn the main switch off.
-4. Plug in the battery.
-5. Turn the main switch on.
-6. Check the Arduino power LED and the buck converter output.
-7. Open Arduino Serial Monitor at 9600 baud.
-8. Send `Forward`. All four wheels should spin for about 0.75 seconds and stop.
-9. Send `Reverse`, then `Left`, then `Right`, then `Stop`.
+3. Confirm both buck outputs are 5.0-5.1 V.
+4. Turn the main switch off.
+5. Plug in the battery.
+6. Turn the main switch on.
+7. Check Arduino power, Pi power, and the buck outputs.
+8. Open Arduino Serial Monitor at 9600 baud.
+9. Send `STATUS`. Confirm voltage is plausible for a 3S LiPo.
+10. Send `LOCK`, then `UNLOCK`, and verify the servo cam moves.
+11. Send `ZEROENC`.
+12. Spin each wheel by hand and send `STATUS`; encoder counts should change.
+13. Send `Forward`. All four wheels should spin for about 0.75 seconds and stop.
+14. Send `Reverse`, then `Left`, then `Right`, then `Stop`.
 
-If one wheel spins the wrong way, swap that motor's two output wires. If an entire side spins backward, check that `L1/L2/R1/R2` drivers are not swapped.
+If one wheel spins the wrong way, swap that motor's two output wires. If an encoder count moves the wrong direction, swap that encoder's A/B signal wires in software or at the Arduino pins after documenting the change.
 
-## 11. Build The Body And Cargo Bay
+## 11. Build The Body, Cargo Bay, Cameras, And Lock
 
 Parts:
 
@@ -190,6 +255,10 @@ Parts:
 - 2 x side rear-half panels
 - 4 x panel center joiners
 - 4 x lid quadrants
+- 2 x camera mounts
+- Servo lock mount
+- Servo lock cam
+- Lock keeper plate
 
 Steps:
 
@@ -204,19 +273,29 @@ Steps:
 9. Bolt the panels to the corner posts using M3 x 20-25 screws, washers, and nyloc nuts.
 10. Install the two HC-SR04 modules from inside the front panel if you bought them.
 11. Tape or lightly glue the clear LED diffuser behind the front slot if you bought an LED strip.
-12. Place the four lid quadrants on top. Use M3 screws through the available lid/post holes where you want a fixed lid, or leave the lid loose during debugging.
+12. Bolt one camera mount to the front panel and one to the rear panel.
+13. Install the front and rear cameras in their mounts and route the USB cables to the Pi.
+14. Bolt or zip-tie the micro servo into `micro_servo_lid_lock_mount.stl`.
+15. Attach `lid_lock_servo_cam.stl` to the servo horn.
+16. Mount the servo lock assembly near the rear top inside edge.
+17. Mount `lid_lock_keeper_plate.stl` to the rear lid/post area so the cam can rotate under the keeper when locked and clear it when unlocked.
+18. Test `LOCK` and `UNLOCK` with the lid off first, then with the lid in place. Adjust the servo angles in the sketch if your servo horn lands differently.
+19. Place the four lid quadrants on top. Use M3 screws through the available lid/post holes where you want a retained lid.
 
-Where the food goes: remove the lid quadrants and place a sealed food-safe container on the cargo floor, inside the four retainer rails. The maximum outside size is 205 x 145 x 70 mm. Food must stay in the sealed container; printed PETG/PLA is not a food-contact surface.
+Where the food goes: unlock/remove the lid and place a sealed food-safe container on the cargo floor, inside the four retainer rails. The maximum outside size is 205 x 145 x 70 mm. Food must stay in the sealed container; printed PETG/PLA is not a food-contact surface.
+
+The printed servo lock is a prototype latch, not theft-proof security hardware.
 
 ## 12. Ground Test
 
 1. Put the robot on the floor with at least 2 m of clear space.
 2. Test first with the food container empty, then with a light payload.
 3. Keep first payload tests at 500 g or less. Increase only after the robot drives straight and the motors stay warm, not hot.
-4. Send `Forward` once. It should move straight for a short pulse.
-5. If it veers left, either the left wheels are weaker or the right wheels are faster. Check bracket rubbing, wheel alignment, and battery charge.
+4. Send `ZEROENC`, then `Forward` once. It should move straight for a short pulse and all four encoder counts should change.
+5. If it veers left, either the left wheels are weaker or the right wheels are faster. Check bracket rubbing, wheel alignment, tire friction, and battery charge.
 6. Send `Left` and `Right`. The robot should pivot.
 7. After one minute of testing, touch the motor drivers and motors carefully. Warm is normal; too hot to touch means stop and inspect binding or wiring.
+8. Check that `TEL` voltage does not drop below the low-voltage cutoff during normal light-load tests.
 
 ## 13. LiPo Safety Rules
 
@@ -225,3 +304,4 @@ Where the food goes: remove the lid quadrants and place a sealed food-safe conta
 - Stop using the pack if it swells, smells sweet/solvent-like, gets hot, or has damaged insulation.
 - Store the battery at storage voltage when not using the robot.
 - Keep the fuse installed. Do not bypass it for testing.
+- The low-voltage telemetry is a helper, not a replacement for LiPo safety discipline.

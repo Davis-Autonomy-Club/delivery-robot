@@ -9,7 +9,7 @@ python cad/source/generate_delivery_robot_cad.py
 
 ## Visual Checks
 
-The generated preview renders were opened and inspected during the CAD pass:
+The generated v2.1 preview renders were opened and inspected during the CAD pass:
 
 ![Complete robot reference](renders/checkpoint_2_complete_robot_iso.png)
 
@@ -21,6 +21,8 @@ The generated preview renders were opened and inspected during the CAD pass:
 
 ![Cargo shelf and max food box](renders/checkpoint_3_cargo_shelf_and_food_box.png)
 
+![Electronics layout with Pi, LTE, and telemetry](renders/checkpoint_4_electronics_layout.png)
+
 Inspection notes:
 
 - The four-wheel layout clears the body panels.
@@ -28,11 +30,14 @@ Inspection notes:
 - The front panels include two HC-SR04 openings and a front LED diffuser slot.
 - The food payload sits in the upper cargo bay on a printed shelf, inside retainer rails, above the electronics bay.
 - The maximum sealed food container envelope is 205 x 145 x 70 mm.
+- The front and rear camera mounts are visible on the body reference and have both M2 camera-board holes and zip-tie slots.
+- The lid-lock servo mount, keeper plate, and cam are included as separate print-ready parts.
+- The electronics layout render includes the Raspberry Pi tray, USB LTE modem tray, battery telemetry plate, and two buck-converter plates.
 - The print parts are flat-oriented or simple upright posts; no support-heavy geometry is required.
 
 ## Mesh Checks
 
-31 STL files were generated. All print-target STL files were checked with `trimesh` and are watertight. The only non-watertight STL is `cad/print-ready/full-size/v2_robot_complete_reference_not_for_print.stl`, which is intentionally a visual assembly reference made from overlapping printable parts plus motor/wheel/food-box placeholders.
+39 STL files were generated. All print-target STL files were checked with `trimesh` and are watertight. The only non-watertight STL is `cad/print-ready/full-size/v2_robot_complete_reference_not_for_print.stl`, which is intentionally a visual assembly reference made from overlapping printable parts plus motor/wheel/food-box/camera/lock placeholders.
 
 Largest print files:
 
@@ -47,5 +52,8 @@ Largest print files:
 | `body/side_panel_front_half_print_2.stl` | 150 x 155 x 6 mm |
 | `body/side_panel_rear_half_print_2.stl` | 150 x 155 x 6 mm |
 | `electronics/3s_lipo_battery_sled.stl` | 155 x 64 x 11 mm |
+| `electronics/raspberry_pi_companion_tray.stl` | 104 x 76 x 12 mm |
+| `electronics/usb_lte_modem_tray.stl` | 96 x 42 x 11 mm |
+| `body/camera_module_mount_print_2.stl` | 64 x 42 x 12 mm |
 
 The merged original repo base, `full-size/original_four_piece_base_merged_full_size.stl`, was also generated and validated as watertight.

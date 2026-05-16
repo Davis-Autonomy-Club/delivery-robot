@@ -14,6 +14,10 @@
     "cad/print-ready/electronics/arduino_mega_controller_tray.stl",
     "cad/print-ready/electronics/bts7960_dual_driver_tray_print_2.stl",
     "cad/print-ready/electronics/3s_lipo_battery_sled.stl",
+    "cad/print-ready/electronics/raspberry_pi_companion_tray.stl",
+    "cad/print-ready/electronics/usb_lte_modem_tray.stl",
+    "cad/print-ready/electronics/battery_telemetry_sensor_plate.stl",
+    "cad/print-ready/electronics/buck_converter_plate_print_2.stl",
     "cad/print-ready/cargo/cargo_floor_front_left.stl",
     "cad/print-ready/cargo/cargo_floor_front_right.stl",
     "cad/print-ready/cargo/cargo_floor_rear_left.stl",
@@ -30,6 +34,10 @@
     "cad/print-ready/body/corner_post_print_4.stl",
     "cad/print-ready/body/panel_center_joiner_print_4.stl",
     "cad/print-ready/body/lid_quadrant_print_4.stl",
+    "cad/print-ready/body/camera_module_mount_print_2.stl",
+    "cad/print-ready/body/micro_servo_lid_lock_mount.stl",
+    "cad/print-ready/body/lid_lock_servo_cam.stl",
+    "cad/print-ready/body/lid_lock_keeper_plate.stl",
     "cad/print-ready/accessories/wheel_white_cap_print_4.stl",
     "cad/print-ready/accessories/front_led_diffuser_clear_print_1.stl",
     "cad/print-ready/full-size/v2_robot_complete_reference_not_for_print.stl"
@@ -41,7 +49,7 @@
     "wheel_d": 120.0,
     "wheel_w": 60.0,
     "motor_d": 37.0,
-    "motor_len": 52.0,
+    "motor_len": 68.0,
     "motor_shaft_d": 6.0,
     "motor_shaft_len": 16.0,
     "motor_x": 108.0,
@@ -61,6 +69,13 @@
     "cargo_rail_h": 16.0,
     "max_food_box_len": 205.0,
     "max_food_box_w": 145.0,
-    "max_food_box_h": 70.0
+    "max_food_box_h": 70.0,
+    "camera_mount_w": 64.0,
+    "camera_mount_h": 42.0,
+    "camera_mount_t": 3.0,
+    "pi_tray_len": 104.0,
+    "pi_tray_w": 76.0,
+    "lte_tray_len": 96.0,
+    "lte_tray_w": 42.0
   }
 }

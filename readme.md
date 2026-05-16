@@ -7,21 +7,26 @@ This Repo contains the Code, 3D Prints and Schematic to Build your own Simple Ar
 
 Feel free to contribute to the Repo. More info on: [smartbuilds.io](https://smartbuilds.io)
 
-## Complete v2 Build Package
+## Complete v2.1 Build Package
 
-The original repo only included four cut chassis STL files. This repo now also includes a full compatible v2 build package:
+The original repo only included four cut chassis STL files. This repo now also includes a full compatible v2.1 build package:
 
 - Print-ready CAD: [`cad/print-ready`](cad/print-ready)
 - CAD source generator: [`cad/source/generate_delivery_robot_cad.py`](cad/source/generate_delivery_robot_cad.py)
 - Print manifest and settings: [`cad/PRINT_MANIFEST.md`](cad/PRINT_MANIFEST.md)
 - Full shopping list: [`docs/SHOPPING_LIST.md`](docs/SHOPPING_LIST.md)
 - Full assembly, wiring, upload, and test instructions: [`docs/ASSEMBLY_INSTRUCTIONS.md`](docs/ASSEMBLY_INSTRUCTIONS.md)
+- Canonical v2.1 wiring: [`docs/CANONICAL_WIRING_V2.md`](docs/CANONICAL_WIRING_V2.md)
 - Visual render checks: [`cad/renders`](cad/renders)
 
-The v2 CAD is designed around the same Arduino Mega + four BTS7960 motor-driver wiring style, with 12 V 37D gearmotors, 6 mm D shafts, 12 mm hex wheel adapters, 120 mm wheels, a 3S LiPo battery, optional HC-SR04 front sensors, and an upper cargo bay for a sealed food-safe container up to 205 x 145 x 70 mm.
+The v2.1 CAD keeps the Arduino Mega + four BTS7960 drivetrain architecture, but now uses encoder 37D gearmotors, a Raspberry Pi companion computer, front and rear camera mounts, a USB LTE modem tray, battery voltage/current telemetry, and a programmatic micro-servo lid lock. The cargo bay still carries a sealed food-safe container up to 205 x 145 x 70 mm.
+
+Important: the old Fritzing/block-diagram image below is retained only as original project history. Do not use it as the v2.1 wiring source. Use [`docs/CANONICAL_WIRING_V2.md`](docs/CANONICAL_WIRING_V2.md) and [`docs/ASSEMBLY_INSTRUCTIONS.md`](docs/ASSEMBLY_INSTRUCTIONS.md).
 
 
-# Part List:
+# Legacy Original Part List:
+
+This section is preserved from the original project for history. Do not buy from this list for v2.1; use [`docs/SHOPPING_LIST.md`](docs/SHOPPING_LIST.md).
 
 Motor Parts 
 - Battery LiPo 11.1V, 3500 mAh 
@@ -69,6 +74,6 @@ Motor Driver Control Pins - Left Motor 1
 
 ## Block Diagram
 
-*Note:* The Block Diagram dosen't show thew Control Pins (Refer to above)
+*Legacy note:* this image is incomplete for v2.1. It does not show the fuse, switch/loop key, buck converters, current sensor, battery voltage divider, lid-lock servo, encoder pins, Pi companion computer, cameras, LTE modem, or all BTS7960 control pins.
 
 ![Droiid Block Diagram](arduino-wheel-robot-diagram.png)

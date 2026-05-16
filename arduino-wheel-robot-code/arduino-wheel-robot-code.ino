@@ -15,9 +15,25 @@
 //Mega PWM Pins (2-13) (44-46)
 
 #include <RobojaxBTS7960.h>
+#include <Servo.h>
 
-int reserved_BluetoothRX  = 0;
-int reserved_BluetoothTX  = 1;
+int reserved_SerialRX = 0;
+int reserved_SerialTX = 1;
+
+// V2.1 accessory pins
+#define LID_LOCK_SERVO_PIN 44
+#define BATTERY_VOLTAGE_PIN A0
+#define BATTERY_CURRENT_PIN A1
+
+// Encoder A channels use external interrupt-capable Mega pins.
+#define ENC_L1_A 18
+#define ENC_L2_A 19
+#define ENC_R1_A 20
+#define ENC_R2_A 21
+#define ENC_L1_B 34
+#define ENC_L2_B 35
+#define ENC_R1_B 36
+#define ENC_R2_B 37
 
 // Front-left motor driver
 #define RPWM_L1 3 // define pin 3 for RPWM pin (output)
@@ -67,11 +83,39 @@ const int LEFT_REVERSE_DIR = CCW;
 const int RIGHT_FORWARD_DIR = CCW;
 const int RIGHT_REVERSE_DIR = CW;
 
+const int LID_LOCKED_ANGLE = 15;
+const int LID_UNLOCKED_ANGLE = 95;
+const float ADC_REF_V = 5.0;
+const float BATTERY_DIVIDER_RATIO = (100.0 + 33.0) / 33.0; // 100k top, 33k bottom
+const float LOW_BATTERY_CUTOFF_V = 10.5; // 3S LiPo under-load cutoff
+const float CURRENT_SENSOR_ZERO_V = 0.50; // Pololu ACS724 0-30A carrier at 5V
+const float CURRENT_SENSOR_V_PER_A = 0.133;
+
+Servo lidLockServo;
+bool lidLocked = true;
+unsigned long lastTelemetryMs = 0;
+
+volatile long encL1 = 0;
+volatile long encL2 = 0;
+volatile long encR1 = 0;
+volatile long encR2 = 0;
+
 RobojaxBTS7960 motor_L1(R_EN_L1, RPWM_L1, R_IS_L1, L_EN_L1, LPWM_L1, L_IS_L1, debug);
 RobojaxBTS7960 motor_L2(R_EN_L2, RPWM_L2, R_IS_L2, L_EN_L2, LPWM_L2, L_IS_L2, debug);
 
 RobojaxBTS7960 motor_R1(R_EN_R1, RPWM_R1, R_IS_R1, L_EN_R1, LPWM_R1, L_IS_R1, debug);
 RobojaxBTS7960 motor_R2(R_EN_R2, RPWM_R2, R_IS_R2, L_EN_R2, LPWM_R2, L_IS_R2, debug);
+
+void updateEncoder(volatile long &count, int pinA, int pinB) {
+  bool a = digitalRead(pinA);
+  bool b = digitalRead(pinB);
+  count += (a == b) ? 1 : -1;
+}
+
+void isrEncL1() { updateEncoder(encL1, ENC_L1_A, ENC_L1_B); }
+void isrEncL2() { updateEncoder(encL2, ENC_L2_A, ENC_L2_B); }
+void isrEncR1() { updateEncoder(encR1, ENC_R1_A, ENC_R1_B); }
+void isrEncR2() { updateEncoder(encR2, ENC_R2_A, ENC_R2_B); }
 
 void setup() {
   Serial.begin(9600);// setup Serial Monitor to display information
@@ -82,6 +126,27 @@ void setup() {
   motor_L2.begin();
   motor_R1.begin();
   motor_R2.begin();
+
+  pinMode(BATTERY_VOLTAGE_PIN, INPUT);
+  pinMode(BATTERY_CURRENT_PIN, INPUT);
+
+  pinMode(ENC_L1_A, INPUT_PULLUP);
+  pinMode(ENC_L2_A, INPUT_PULLUP);
+  pinMode(ENC_R1_A, INPUT_PULLUP);
+  pinMode(ENC_R2_A, INPUT_PULLUP);
+  pinMode(ENC_L1_B, INPUT_PULLUP);
+  pinMode(ENC_L2_B, INPUT_PULLUP);
+  pinMode(ENC_R1_B, INPUT_PULLUP);
+  pinMode(ENC_R2_B, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ENC_L1_A), isrEncL1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC_L2_A), isrEncL2, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC_R1_A), isrEncR1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENC_R2_A), isrEncR2, CHANGE);
+
+  lidLockServo.attach(LID_LOCK_SERVO_PIN);
+  lock_Lid();
+
+  Serial.println("Ready. Commands: F/B/L/R/S, LOCK, UNLOCK, STATUS, ZEROENC.");
 
 }
 
@@ -97,31 +162,137 @@ void loop() {
     String data = Serial.readStringUntil('\n');
     data.trim();
     data.toUpperCase();
-    Serial.print("Command Recieved: ");
+    Serial.print("Command Received: ");
     Serial.println(data);
 
     //Move Droiid Bot
     if (data == "LEFT" || data == "L") {
-      turn_Left(60);
-      Serial.println("Left");
+      if (driveAllowed()) {
+        turn_Left(60);
+        Serial.println("Left");
+      }
     } else if (data == "RIGHT" || data == "R") {
-      turn_Right(60);
-      Serial.println("Right");
+      if (driveAllowed()) {
+        turn_Right(60);
+        Serial.println("Right");
+      }
     } else if (data == "FORWARD" || data == "F") {
-      motor_Forward(60);
-      Serial.println("Forward");
+      if (driveAllowed()) {
+        motor_Forward(60);
+        Serial.println("Forward");
+      }
     } else if (data == "REVERSE" || data == "BACK" || data == "B") {
-      motor_Reverse(60);
-      Serial.println("Reverse");
+      if (driveAllowed()) {
+        motor_Reverse(60);
+        Serial.println("Reverse");
+      }
     } else if (data == "STOP" || data == "S") {
       stop_All();
       Serial.println("Stop");
+    } else if (data == "LOCK") {
+      lock_Lid();
+      Serial.println("Lid locked");
+    } else if (data == "UNLOCK") {
+      unlock_Lid();
+      Serial.println("Lid unlocked");
+    } else if (data == "STATUS" || data == "TELEMETRY" || data == "T") {
+      printTelemetry();
+    } else if (data == "ZEROENC") {
+      zeroEncoders();
+      Serial.println("Encoders zeroed");
     } else {
-      Serial.println("Unknown command. Use Forward, Reverse, Left, Right, or Stop.");
+      Serial.println("Unknown command. Use F, B, L, R, S, LOCK, UNLOCK, STATUS, or ZEROENC.");
     }
   }
 
+  if (millis() - lastTelemetryMs >= 1000) {
+    printTelemetry();
+    lastTelemetryMs = millis();
+  }
 
+
+}
+
+float readBatteryVoltage() {
+  float raw = analogRead(BATTERY_VOLTAGE_PIN);
+  float pinV = raw * ADC_REF_V / 1023.0;
+  return pinV * BATTERY_DIVIDER_RATIO;
+}
+
+float readBatteryCurrent() {
+  float raw = analogRead(BATTERY_CURRENT_PIN);
+  float sensorV = raw * ADC_REF_V / 1023.0;
+  float amps = (sensorV - CURRENT_SENSOR_ZERO_V) / CURRENT_SENSOR_V_PER_A;
+  if (amps < 0) {
+    amps = 0;
+  }
+  return amps;
+}
+
+bool batteryLow() {
+  float v = readBatteryVoltage();
+  return v > 7.0 && v < LOW_BATTERY_CUTOFF_V;
+}
+
+bool driveAllowed() {
+  if (batteryLow()) {
+    stop_All();
+    Serial.println("LOW_BATTERY_DRIVE_LOCKOUT");
+    printTelemetry();
+    return false;
+  }
+  return true;
+}
+
+void lock_Lid() {
+  lidLockServo.write(LID_LOCKED_ANGLE);
+  lidLocked = true;
+}
+
+void unlock_Lid() {
+  lidLockServo.write(LID_UNLOCKED_ANGLE);
+  lidLocked = false;
+}
+
+void zeroEncoders() {
+  noInterrupts();
+  encL1 = 0;
+  encL2 = 0;
+  encR1 = 0;
+  encR2 = 0;
+  interrupts();
+}
+
+void getEncoderSnapshot(long &l1, long &l2, long &r1, long &r2) {
+  noInterrupts();
+  l1 = encL1;
+  l2 = encL2;
+  r1 = encR1;
+  r2 = encR2;
+  interrupts();
+}
+
+void printTelemetry() {
+  long l1, l2, r1, r2;
+  getEncoderSnapshot(l1, l2, r1, r2);
+  float voltage = readBatteryVoltage();
+  float current = readBatteryCurrent();
+  Serial.print("TEL,V=");
+  Serial.print(voltage, 2);
+  Serial.print(",I=");
+  Serial.print(current, 2);
+  Serial.print(",LOW=");
+  Serial.print(batteryLow() ? 1 : 0);
+  Serial.print(",LOCK=");
+  Serial.print(lidLocked ? 1 : 0);
+  Serial.print(",ENC=");
+  Serial.print(l1);
+  Serial.print("/");
+  Serial.print(l2);
+  Serial.print("/");
+  Serial.print(r1);
+  Serial.print("/");
+  Serial.println(r2);
 }
 
 void drive_Left(int PWM_pcntg, bool forward) {
