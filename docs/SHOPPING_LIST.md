@@ -2,7 +2,17 @@
 
 This is the compatible v2.2 bill of materials for `cad/print-ready/`. It keeps the Arduino Mega + 4 x BTS7960 motor-driver architecture, but upgrades the prototype with encoder motors, a programmatic lid lock, front/rear cameras, a Raspberry Pi companion computer, USB LTE, battery telemetry, lid-closed sensing, and an external stop input.
 
-Buying links are collected in [`docs/SOURCED_SHOPPING_LINKS_CA.md`](SOURCED_SHOPPING_LINKS_CA.md). Re-check exact availability before purchase.
+Buying links are collected in [`docs/SOURCED_SHOPPING_LINKS_CA.md`](SOURCED_SHOPPING_LINKS_CA.md). The live Amazon cart snapshot from the latest manual trim is recorded in [`docs/CURRENT_AMAZON_CART_SYNC.md`](CURRENT_AMAZON_CART_SYNC.md). Re-check exact availability before purchase.
+
+## Current Cart Status
+
+As of the May 16, 2026 cart sync, the active Amazon cart contains 36 line items / 38 units with a $617.05 pre-tax subtotal. The known Pololu cart from the previous sync was $379.35, so the combined pre-tax subtotal is $996.40 if that Pololu cart is unchanged.
+
+That active Amazon cart is not a complete build kit by itself. It assumes some required parts and tools are already on hand or will be supplied separately:
+
+- Compatible 120 mm / 12 mm-hex wheels, fuses, inline fuse holder, power distribution block, printable filament, battery straps, LiPo-safe bag, and basic wiring/assembly tools are not active in the Amazon cart.
+- The two cameras, LTE modem, SIM, and USB cabling are active, but the Raspberry Pi and microSD card are not. Keep that only if a Pi and microSD are already available; otherwise add them back before building the camera/LTE stack.
+- The B6 charger and XT60 pigtail kit are still active. If the existing OVONIC X1 charger and MCIGICM XT60H connectors will replace them, delete those cart lines and update this section again.
 
 ## Buy These Parts
 
