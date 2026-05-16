@@ -838,18 +838,18 @@ def main() -> None:
     cargo_open = reference_assembly(base, include_lid=False)
     electronics_layout = electronics_layout_assembly(base)
 
-    render_meshes([assembly], RENDER_OUT / "checkpoint_2_complete_robot_iso.png", "Checkpoint 2: v2.1 complete robot reference")
+    render_meshes([assembly], RENDER_OUT / "checkpoint_2_complete_robot_iso.png", "Checkpoint 2: v2.2 complete robot reference")
     render_meshes(
         [assembly],
         RENDER_OUT / "checkpoint_2_complete_robot_low_angle.png",
-        "Checkpoint 2: v2.1 low angle wheel/body clearance",
+        "Checkpoint 2: v2.2 low angle wheel/body clearance",
         yaw_deg=18,
         pitch_deg=8,
     )
     render_meshes(
         [cargo_open],
         RENDER_OUT / "checkpoint_3_cargo_bay_lid_removed.png",
-        "Checkpoint 3: v2.1 lid removed, lock and cargo bay visible",
+        "Checkpoint 3: v2.2 lid removed, lock and cargo bay visible",
         yaw_deg=32,
         pitch_deg=34,
     )
@@ -857,7 +857,7 @@ def main() -> None:
     render_meshes(
         [electronics_layout],
         RENDER_OUT / "checkpoint_4_electronics_layout.png",
-        "Checkpoint 4: v2.1 electronics layout with Pi, LTE, telemetry",
+        "Checkpoint 4: v2.2 electronics layout with Pi, LTE, telemetry",
         yaw_deg=34,
         pitch_deg=36,
     )
@@ -869,7 +869,7 @@ def main() -> None:
         transform_copy(camera_module_mount(), (360, 0, 0)),
         transform_copy(micro_servo_lid_lock_mount(), (455, 0, 0)),
     ]
-    render_meshes(sample_parts, RENDER_OUT / "checkpoint_2_printed_panel_samples.png", "Checkpoint 2: v2.1 representative print parts")
+    render_meshes(sample_parts, RENDER_OUT / "checkpoint_2_printed_panel_samples.png", "Checkpoint 2: v2.2 representative print parts")
     cargo_parts = [
         cargo_floor,
         transform_copy(cargo_retainer_long_rail(), (0, 82, D.cargo_floor_t)),

@@ -20,7 +20,7 @@ Print the files listed in `cad/PRINT_MANIFEST.md`. After printing:
 1. Confirm the four base plates are flat and not curled.
 2. Test an M3 screw through every base seam hole, panel hole, corner-post hole, tray hole, and camera-mount hole. Clear tight holes with a 3.0-3.2 mm drill bit by hand.
 3. Dry-fit the four base plates on a table. The total base should be about 322 x 328 mm.
-4. Confirm the new v2.1 parts are present: camera mount, servo lock mount, lock cam, lock keeper, Raspberry Pi tray, LTE tray, telemetry plate, and two buck-converter plates.
+4. Confirm the v2.2 parts are present: camera mount, servo lock mount, lock cam, lock keeper, Raspberry Pi tray, LTE tray, telemetry plate, two buck-converter plates, external stop button, and lid-closed switch.
 5. Check the renders in `cad/renders/` against your printed parts so you know what the final shape should look like.
 
 ## 2. Assemble The Base
@@ -81,7 +81,7 @@ Parts:
 - USB LTE modem
 - Pololu ACS724 current sensor
 - 2 x 5 V buck converters
-- Fuse holder, switch or XT60 loop key, and terminal/distribution blocks
+- Fuse holder, switch or XT60 loop key, external stop button, lid-closed switch, cable glands/strain relief, and terminal/distribution blocks
 
 Suggested layout:
 
@@ -93,6 +93,9 @@ Suggested layout:
 - Telemetry plate: near the fuse/switch and distribution blocks.
 - Fuse and switch: close to battery positive, reachable through the lid.
 - Buck converters: one for Arduino/BTS logic/servo, one for Pi/cameras/LTE.
+- External stop button: on an outside panel where it can be hit quickly.
+- Lid-closed switch: one half on the body/post area and the matching magnet or actuator on the lid.
+- Cable glands/strain relief: on any cable exits that leave the protected electronics bay.
 
 Steps:
 
@@ -103,14 +106,17 @@ Steps:
 5. Mount or strap the USB LTE modem into the LTE tray.
 6. Mount the ACS724 current sensor and the voltage-divider perfboard on the telemetry plate.
 7. Mount both buck converters to the buck plates.
-8. Strap the battery into the sled with two Velcro straps, but leave it unplugged.
-9. Route motor wires and encoder wires through the corner cable slots toward the matching driver tray and Arduino.
+8. Test-fit one battery pack in the sled with two Velcro straps, but leave it unplugged. Keep the second matching pack outside the robot as a charged spare.
+9. Mount the external stop button and lid-closed switch hardware before final body closure.
+10. Route motor wires, encoder wires, switch wires, and sensor wires through the corner cable slots toward the matching driver tray and Arduino.
 
 ## 5. Power Wiring
 
 Keep the battery unplugged while building.
 
 Important: do not use a solderless breadboard for any motor or battery power. Use real wire, crimped or soldered joints, distribution blocks, and strain relief.
+
+Only one LiPo pack is installed in the robot at a time. The second matching pack is for repeated tests; it is not wired in parallel.
 
 High-current path:
 
@@ -130,7 +136,9 @@ High-current path:
 2. Logic/accessory buck 5 V powers Arduino Mega `5V`, all BTS7960 `Vcc` pins, lid servo red wire, ACS724 `VCC`, and the top of the encoder 5 V rail.
 3. Logic/accessory buck ground powers Arduino `GND`, all BTS7960 `Gnd` pins, lid servo ground, ACS724 ground, encoder grounds, and voltage-divider ground.
 4. Pi/camera/LTE buck powers the Raspberry Pi through a USB-C power pigtail/breakout or equivalent 5 V input method. Do not feed raw 3S battery voltage to the Pi.
-5. The two 5 V positive rails stay separate. Their grounds are common.
+5. Plug the Arduino Mega, front camera, rear camera, and LTE modem directly into the Raspberry Pi for the first build. Skip the desk-style wall-adapter USB hub.
+6. If later testing shows Pi USB brownouts, add a compact hub only if it can be powered cleanly from the onboard 5 V Pi rail.
+7. The two 5 V positive rails stay separate. Their grounds are common.
 
 Battery voltage divider:
 
@@ -181,15 +189,21 @@ For every driver:
 
 Each encoder also needs 5 V and ground from the logic/accessory rail. The sketch uses interrupts on the A channels and reads B channels for direction.
 
-### Telemetry And Lid Lock
+### Telemetry, Lid Lock, And Safety Inputs
 
 | Function | Signal pin |
 | --- | ---: |
 | Lid-lock servo | D44 |
+| External stop input | D42 |
+| Lid-closed switch input | D43 |
 | Battery voltage divider | A0 |
 | ACS724 current sensor `VIOUT` | A1 |
 
 The lid-lock servo gets power from the logic/accessory 5 V buck, not from a weak USB-only Arduino connection.
+
+External stop wiring: use a normally-closed contact between D42 and Arduino GND. When the button is released and the wire is healthy, D42 reads LOW. Pressing the button or breaking the wire makes D42 read HIGH and the sketch refuses to drive.
+
+Lid-closed wiring: wire the reed switch or microswitch between D43 and Arduino GND so a closed lid pulls D43 LOW. An open lid makes D43 HIGH and the sketch refuses to drive. For early bench testing before the lid switch is mounted, use a clearly labeled temporary jumper from D43 to GND, then remove the jumper when the real switch is installed.
 
 ## 8. Cameras, LTE, And Pi Link
 
@@ -198,7 +212,8 @@ The lid-lock servo gets power from the logic/accessory 5 V buck, not from a weak
 3. Connect both cameras to the Raspberry Pi.
 4. Install the USB LTE modem in its tray and connect it to the Pi.
 5. Install the activated SIM in the LTE modem.
-6. Connect the Arduino Mega to the Pi by USB. The Arduino sketch uses 9600 baud serial.
+6. Connect the Arduino Mega to the Pi by USB A-to-B cable. The Arduino sketch uses 9600 baud serial.
+7. Do not use the Sabrent wall-adapter desk hub onboard. The four Pi USB ports are enough for Arduino, two cameras, and LTE. Revisit a rail-powered hub only if logs or testing show USB brownouts.
 
 This repo does not yet include the Pi teleop dashboard. The Pi is now mechanically and electrically provisioned so the next software sprint can stream camera video, forward commands to the Arduino, and report telemetry over LTE.
 
@@ -216,7 +231,7 @@ The sketch accepts these serial commands at 9600 baud: `Forward`, `Reverse`, `Le
 Telemetry prints once per second:
 
 ```text
-TEL,V=12.10,I=1.25,LOW=0,LOCK=1,ENC=123/121/119/124
+TEL,V=12.10,I=1.25,LOW=0,ESTOP=0,LID_CLOSED=1,LOCK=1,ENC=123/121/119/124
 ```
 
 ## 10. First Power Test
@@ -231,12 +246,14 @@ Do this with the robot on blocks so the wheels are off the table.
 6. Turn the main switch on.
 7. Check Arduino power, Pi power, and the buck outputs.
 8. Open Arduino Serial Monitor at 9600 baud.
-9. Send `STATUS`. Confirm voltage is plausible for a 3S LiPo.
-10. Send `LOCK`, then `UNLOCK`, and verify the servo cam moves.
-11. Send `ZEROENC`.
-12. Spin each wheel by hand and send `STATUS`; encoder counts should change.
-13. Send `Forward`. All four wheels should spin for about 0.75 seconds and stop.
-14. Send `Reverse`, then `Left`, then `Right`, then `Stop`.
+9. Send `STATUS`. Confirm voltage is plausible for a 3S LiPo, `ESTOP=0`, and `LID_CLOSED=1`.
+10. Press the external stop button and send `STATUS`; confirm `ESTOP=1`. Try `Forward`; the robot must refuse to drive. Reset the stop button before continuing.
+11. Open the lid or move the lid-switch magnet away and send `STATUS`; confirm `LID_CLOSED=0`. Try `Forward`; the robot must refuse to drive. Close the lid before continuing.
+12. Send `LOCK`, then `UNLOCK`, and verify the servo cam moves.
+13. Send `ZEROENC`.
+14. Spin each wheel by hand and send `STATUS`; encoder counts should change.
+15. Send `Forward`. All four wheels should spin for about 0.75 seconds and stop.
+16. Send `Reverse`, then `Left`, then `Right`, then `Stop`.
 
 If one wheel spins the wrong way, swap that motor's two output wires. If an encoder count moves the wrong direction, swap that encoder's A/B signal wires in software or at the Arduino pins after documenting the change.
 
@@ -279,8 +296,10 @@ Steps:
 15. Attach `lid_lock_servo_cam.stl` to the servo horn.
 16. Mount the servo lock assembly near the rear top inside edge.
 17. Mount `lid_lock_keeper_plate.stl` to the rear lid/post area so the cam can rotate under the keeper when locked and clear it when unlocked.
-18. Test `LOCK` and `UNLOCK` with the lid off first, then with the lid in place. Adjust the servo angles in the sketch if your servo horn lands differently.
-19. Place the four lid quadrants on top. Use M3 screws through the available lid/post holes where you want a retained lid.
+18. Mount the lid-closed switch so the closed lid pulls D43 to ground. Verify `LID_CLOSED=1` with the lid closed and `LID_CLOSED=0` with the lid open.
+19. Test `LOCK` and `UNLOCK` with the lid off first, then with the lid in place. Adjust the servo angles in the sketch if your servo horn lands differently.
+20. Place the four lid quadrants on top. Use M3 screws through the available lid/post holes where you want a retained lid.
+21. Apply foam edge bumper around the outer body perimeter where it will not rub the wheels, block camera views, or cover the external stop button.
 
 Where the food goes: unlock/remove the lid and place a sealed food-safe container on the cargo floor, inside the four retainer rails. The maximum outside size is 205 x 145 x 70 mm. Food must stay in the sealed container; printed PETG/PLA is not a food-contact surface.
 
@@ -297,10 +316,21 @@ The printed servo lock is a prototype latch, not theft-proof security hardware.
 7. After one minute of testing, touch the motor drivers and motors carefully. Warm is normal; too hot to touch means stop and inspect binding or wiring.
 8. Check that `TEL` voltage does not drop below the low-voltage cutoff during normal light-load tests.
 
-## 13. LiPo Safety Rules
+## 13. Final Physical Fit Checks
+
+Before printing duplicate replacement parts or committing to outdoor testing, verify these by hand:
+
+- Wheel hub depth, wheel screw length, wheel offset, and body/bracket clearance with the exact wheel set.
+- Battery pack footprint, height, XT60 cable exit direction, and strap fit against `3s_lipo_battery_sled.stl`.
+- Food container outside dimensions against the cargo retainer rails. The maximum outside size is 205 x 145 x 70 mm.
+- Raspberry Pi kit extras against the tray. The tray is for the bare Pi board; the CanaKit case and switch cable are not assumed to fit.
+- Cable glands grip the actual cables without crushing USB leads, camera leads, or LTE wiring.
+
+## 14. LiPo Safety Rules
 
 - Never charge the LiPo inside the robot.
 - Never leave a charging LiPo unattended.
+- Use the RC balance charger, connect both the main pack lead and the balance lead, select 3S LiPo mode, and set a conservative charge current. For a 5200 mAh pack, 5.2 A is 1C; lower is gentler.
 - Stop using the pack if it swells, smells sweet/solvent-like, gets hot, or has damaged insulation.
 - Store the battery at storage voltage when not using the robot.
 - Keep the fuse installed. Do not bypass it for testing.

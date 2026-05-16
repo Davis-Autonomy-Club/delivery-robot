@@ -12,7 +12,7 @@ Also included:
 
 `OPEN_ME_full_base_plate_reference.stl`
 
-This shows the complete one-piece v2.1 base plate. Most printers should still print the four split base pieces from `cad/print-ready/chassis/`.
+This shows the complete one-piece v2.2 base plate. Most printers should still print the four split base pieces from `cad/print-ready/chassis/`.
 
 ## Recommended Viewers
 

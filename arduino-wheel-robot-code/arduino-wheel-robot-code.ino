@@ -20,8 +20,10 @@
 int reserved_SerialRX = 0;
 int reserved_SerialTX = 1;
 
-// V2.1 accessory pins
+// V2.2 accessory and safety pins
 #define LID_LOCK_SERVO_PIN 44
+#define ESTOP_PIN 42
+#define LID_CLOSED_PIN 43
 #define BATTERY_VOLTAGE_PIN A0
 #define BATTERY_CURRENT_PIN A1
 
@@ -90,6 +92,7 @@ const float BATTERY_DIVIDER_RATIO = (100.0 + 33.0) / 33.0; // 100k top, 33k bott
 const float LOW_BATTERY_CUTOFF_V = 10.5; // 3S LiPo under-load cutoff
 const float CURRENT_SENSOR_ZERO_V = 0.50; // Pololu ACS724 0-30A carrier at 5V
 const float CURRENT_SENSOR_V_PER_A = 0.133;
+const unsigned long DRIVE_SAFETY_POLL_MS = 10;
 
 Servo lidLockServo;
 bool lidLocked = true;
@@ -129,6 +132,8 @@ void setup() {
 
   pinMode(BATTERY_VOLTAGE_PIN, INPUT);
   pinMode(BATTERY_CURRENT_PIN, INPUT);
+  pinMode(ESTOP_PIN, INPUT_PULLUP);
+  pinMode(LID_CLOSED_PIN, INPUT_PULLUP);
 
   pinMode(ENC_L1_A, INPUT_PULLUP);
   pinMode(ENC_L2_A, INPUT_PULLUP);
@@ -210,6 +215,9 @@ void loop() {
     lastTelemetryMs = millis();
   }
 
+  if (!safetyInputsOk()) {
+    stop_All();
+  }
 
 }
 
@@ -234,7 +242,33 @@ bool batteryLow() {
   return v > 7.0 && v < LOW_BATTERY_CUTOFF_V;
 }
 
+bool eStopActive() {
+  // NC stop switch wiring: released = closed to ground, pressed or unplugged = HIGH.
+  return digitalRead(ESTOP_PIN) == HIGH;
+}
+
+bool lidClosed() {
+  // Lid switch wiring: closed lid pulls the input to ground.
+  return digitalRead(LID_CLOSED_PIN) == LOW;
+}
+
+bool safetyInputsOk() {
+  return !eStopActive() && lidClosed();
+}
+
 bool driveAllowed() {
+  if (eStopActive()) {
+    stop_All();
+    Serial.println("ESTOP_DRIVE_LOCKOUT");
+    printTelemetry();
+    return false;
+  }
+  if (!lidClosed()) {
+    stop_All();
+    Serial.println("LID_OPEN_DRIVE_LOCKOUT");
+    printTelemetry();
+    return false;
+  }
   if (batteryLow()) {
     stop_All();
     Serial.println("LOW_BATTERY_DRIVE_LOCKOUT");
@@ -242,6 +276,17 @@ bool driveAllowed() {
     return false;
   }
   return true;
+}
+
+void holdDriveFor(unsigned long durationMs) {
+  unsigned long startMs = millis();
+  while (millis() - startMs < durationMs) {
+    if (!safetyInputsOk()) {
+      stop_All();
+      return;
+    }
+    delay(DRIVE_SAFETY_POLL_MS);
+  }
 }
 
 void lock_Lid() {
@@ -283,6 +328,10 @@ void printTelemetry() {
   Serial.print(current, 2);
   Serial.print(",LOW=");
   Serial.print(batteryLow() ? 1 : 0);
+  Serial.print(",ESTOP=");
+  Serial.print(eStopActive() ? 1 : 0);
+  Serial.print(",LID_CLOSED=");
+  Serial.print(lidClosed() ? 1 : 0);
   Serial.print(",LOCK=");
   Serial.print(lidLocked ? 1 : 0);
   Serial.print(",ENC=");
@@ -318,7 +367,7 @@ void turn_Left(int PWM_pcntg) {
   drive_Left(PWM_pcntg, false);
   drive_Right(PWM_pcntg, true);
 
-  delay(motor_high);
+  holdDriveFor(motor_high);
   stop_All();
 
 }
@@ -327,7 +376,7 @@ void turn_Right(int PWM_pcntg) {
   drive_Left(PWM_pcntg, true);
   drive_Right(PWM_pcntg, false);
 
-  delay(motor_high);
+  holdDriveFor(motor_high);
   stop_All();
 
 }
@@ -336,7 +385,7 @@ void motor_Forward(int PWM_pcntg) {
   drive_Left(PWM_pcntg, true);
   drive_Right(PWM_pcntg, true);
 
-  delay(motor_high);
+  holdDriveFor(motor_high);
 
   stop_All();
 
@@ -347,7 +396,7 @@ void motor_Reverse(int PWM_pcntg) {
   drive_Left(PWM_pcntg, false);
   drive_Right(PWM_pcntg, false);
 
-  delay(motor_high);
+  holdDriveFor(motor_high);
 
   stop_All();
 

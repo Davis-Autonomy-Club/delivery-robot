@@ -33,7 +33,7 @@ The one-piece `cad/print-ready/full-size/v2_base_plate_full_size.stl` is include
 | --- | ---: | --- |
 | `cad/print-ready/electronics/arduino_mega_controller_tray.stl` | 1 | Mega tray with slotted tie-downs and M3 standoff holes |
 | `cad/print-ready/electronics/bts7960_dual_driver_tray_print_2.stl` | 2 | Holds two BTS7960 modules per tray |
-| `cad/print-ready/electronics/3s_lipo_battery_sled.stl` | 1 | Fits typical 3S 3500 mAh pack with two Velcro straps |
+| `cad/print-ready/electronics/3s_lipo_battery_sled.stl` | 1 | Strapped tray for one 3S pack at a time; verify exact 5200 mAh pack dimensions and cable exit before printing battery-specific add-ons |
 | `cad/print-ready/electronics/raspberry_pi_companion_tray.stl` | 1 | Raspberry Pi companion-computer tray for camera/LTE/teleop host |
 | `cad/print-ready/electronics/usb_lte_modem_tray.stl` | 1 | Strap-down tray for a compact USB LTE modem |
 | `cad/print-ready/electronics/battery_telemetry_sensor_plate.stl` | 1 | Mounting plate for ACS724 current sensor and voltage-divider board |
@@ -91,4 +91,4 @@ Maximum food-safe container outer size: 205 x 145 x 70 mm. Use a sealed food-saf
 | `cad/renders/checkpoint_2_printed_panel_samples.png` | Rendered print-part sample check |
 | `cad/renders/checkpoint_3_cargo_bay_lid_removed.png` | Rendered cargo-bay check with lid removed |
 | `cad/renders/checkpoint_3_cargo_shelf_and_food_box.png` | Rendered cargo shelf with max-size food box placeholder |
-| `cad/renders/checkpoint_4_electronics_layout.png` | Rendered v2.1 electronics layout with Pi, LTE, telemetry, and buck plates |
+| `cad/renders/checkpoint_4_electronics_layout.png` | Rendered v2.2 electronics layout with Pi, LTE, telemetry, and buck plates |

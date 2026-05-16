@@ -1,8 +1,8 @@
-# Canonical V2.1 Wiring
+# Canonical V2.2 Wiring
 
-This file is the wiring source of truth for the v2.1 build. The old root-level Fritzing/block-diagram image is legacy and incomplete.
+This file is the wiring source of truth for the v2.2 build. The old root-level Fritzing/block-diagram image is legacy and incomplete.
 
-![Canonical v2.1 wiring diagram](wiring_v2_1_canonical.svg)
+![Canonical v2.2 wiring diagram](wiring_v2_2_canonical.svg)
 
 ## Non-Negotiable Safety Rules
 
@@ -12,6 +12,8 @@ This file is the wiring source of truth for the v2.1 build. The old root-level F
 - Use a real positive distribution block and a real negative distribution block.
 - All grounds must be common: battery negative, Arduino ground, Pi buck ground, logic buck ground, BTS7960 grounds, servo ground, current-sensor ground, and voltage-divider ground.
 - Never charge the LiPo through the robot wiring.
+- The external stop button and lid-closed switch are Arduino drive-lockout inputs. They do not replace the main switch or XT60 loop key as the hard power disconnect.
+- Install only one LiPo pack in the robot at a time. The second matching pack is a charged spare for repeated testing.
 
 ## Power Path
 
@@ -44,6 +46,8 @@ Use two buck converters:
 
 The two 5 V positive rails should stay separate. The grounds are common.
 
+Skip the desk-style wall-adapter USB hub for the first build. The Pi has four USB ports for the Arduino, front camera, rear camera, and LTE modem. If testing shows USB brownouts later, use a compact hub that is intentionally fed from the onboard 5 V Pi rail.
+
 ## Arduino Signal Map
 
 ### BTS7960 Motor Drivers
@@ -64,11 +68,13 @@ The two 5 V positive rails should stay separate. The grounds are common.
 | `R1` front-right | D20 | D36 | 5 V and GND |
 | `R2` rear-right | D21 | D37 | 5 V and GND |
 
-### Telemetry And Lock
+### Telemetry, Lock, And Safety Inputs
 
 | Function | Arduino pin | Wiring |
 | --- | ---: | --- |
 | Lid-lock servo signal | D44 | Servo red to 5 V accessory rail, brown/black to common ground |
+| External stop input | D42 | Normally-closed stop switch contact from D42 to GND. Released/healthy = LOW; pressed or unplugged = HIGH |
+| Lid-closed input | D43 | Reed switch or microswitch from D43 to GND. Closed lid = LOW; open lid = HIGH |
 | Battery voltage divider output | A0 | 100 kOhm top resistor from switched battery positive to A0; 33 kOhm bottom resistor from A0 to ground |
 | ACS724 current sensor output | A1 | ACS724 `VIOUT` to A1, `VCC` to 5 V accessory rail, `GND` to common ground |
 
@@ -78,6 +84,8 @@ The two 5 V positive rails should stay separate. The grounds are common.
 - Front USB/UVC camera connects to the Pi.
 - Rear USB/UVC camera connects to the Pi.
 - USB LTE modem connects to the Pi and needs its own activated SIM/data plan.
+- Use a USB A-to-B cable for the Arduino Mega unless your Mega kit includes one.
+- Do not install the desk-style Sabrent wall-adapter USB hub. Use the Pi ports directly for the first build.
 - The current Arduino sketch does not implement a web dashboard. It exposes serial commands and telemetry so the Pi can run the teleop software in the next phase.
 
 ## Serial Commands
@@ -99,5 +107,5 @@ At 9600 baud:
 Telemetry prints as:
 
 ```text
-TEL,V=12.10,I=1.25,LOW=0,LOCK=1,ENC=123/121/119/124
+TEL,V=12.10,I=1.25,LOW=0,ESTOP=0,LID_CLOSED=1,LOCK=1,ENC=123/121/119/124
 ```

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-label="Canonical v2.1 delivery robot wiring diagram">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880" role="img" aria-label="Canonical v2.2 delivery robot wiring diagram">
   <defs>
     <style>
       .box { fill: #ffffff; stroke: #24313f; stroke-width: 2; rx: 10; }
@@ -19,7 +19,7 @@
     <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#6a1b9a"/></marker>
   </defs>
 
-  <text x="40" y="42" class="label" style="font-size:28px;font-weight:bold">Delivery Robot V2.1 Canonical Wiring</text>
+  <text x="40" y="42" class="label" style="font-size:28px;font-weight:bold">Delivery Robot V2.2 Canonical Wiring</text>
   <text x="40" y="70" class="warn">Do not use a solderless breadboard for motor or battery power.</text>
 
   <rect class="box" x="40" y="110" width="150" height="70"/>
@@ -98,11 +98,18 @@
   <text class="small" x="922" y="574">front USB/UVC camera</text>
   <text class="small" x="922" y="596">rear USB/UVC camera</text>
   <text class="small" x="922" y="618">USB LTE modem + SIM</text>
+  <text class="tiny" x="922" y="638">skip desk hub initially</text>
+
+  <rect class="box" x="335" y="660" width="330" height="95"/>
+  <text class="label" x="395" y="692">Safety Inputs</text>
+  <text class="small" x="365" y="716">D42 external stop, NC to GND</text>
+  <text class="small" x="365" y="738">D43 lid closed switch to GND</text>
 
   <path class="signal" d="M270 575 H360"/>
   <path class="signal" d="M525 575 H590"/>
   <path class="signal" d="M700 530 V415"/>
+  <path class="signal" d="M500 660 V415"/>
   <path class="usb" d="M1010 515 V415"/>
 
-  <text class="tiny" x="42" y="780">Red = battery power, black = ground, blue = regulated 5 V logic, green = Arduino signal, purple = USB.</text>
+  <text class="tiny" x="42" y="835">Red = battery power, black = ground, blue = regulated 5 V logic, green = Arduino signal, purple = USB.</text>
 </svg>

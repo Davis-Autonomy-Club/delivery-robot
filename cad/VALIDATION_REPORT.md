@@ -9,7 +9,7 @@ python cad/source/generate_delivery_robot_cad.py
 
 ## Visual Checks
 
-The generated v2.1 preview renders were opened and inspected during the CAD pass:
+The generated v2.2 preview renders were opened and inspected during the CAD pass:
 
 ![Complete robot reference](renders/checkpoint_2_complete_robot_iso.png)
 
